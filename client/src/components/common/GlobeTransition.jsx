@@ -16,7 +16,7 @@ export const GlobeTransition = ({ onComplete }) => {
     const width = container.clientWidth || window.innerWidth;
     const height = container.clientHeight || window.innerHeight;
 
-    // 1. Three.js Scene Setup (Transparent Canvas over Pre-rendered Landing Page)
+    // 1. Three.js Scene Setup (Transparent WebGL Canvas overlay)
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(55, width / height, 1, 2000);
     camera.position.z = 1000;
@@ -30,7 +30,11 @@ export const GlobeTransition = ({ onComplete }) => {
     const globeGroup = new THREE.Group();
     scene.add(globeGroup);
 
-    // 2. Palette Tokens
+    // Initial position deep in Z-axis space (-1200px) and tiny scale (0.10)
+    globeGroup.position.z = -1200;
+    globeGroup.scale.set(0.1, 0.1, 0.1);
+
+    // 2. Color Palette Tokens
     const COLOR_PRIMARY_ACCENT = new THREE.Color('#55443A'); // Liver Chestnut
     const COLOR_SECONDARY_ACCENT = new THREE.Color('#8A9992'); // Morning Blue
     const COLOR_SURFACE = new THREE.Color('#4D2308'); // Arsenic
@@ -67,17 +71,17 @@ export const GlobeTransition = ({ onComplete }) => {
     particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
     const particlesMaterial = new THREE.PointsMaterial({
-      size: 4.2,
+      size: 4.5,
       vertexColors: true,
       transparent: true,
-      opacity: 0.9,
+      opacity: 0.1, // Brightens from 0.1 -> 0.9 as it approaches
       blending: THREE.AdditiveBlending
     });
 
     const particleSystem = new THREE.Points(particlesGeometry, particlesMaterial);
     globeGroup.add(particleSystem);
 
-    // 4. Connecting Neural Mesh Lines
+    // 4. Connecting Neural Line Segments
     const linePositions = [];
     const maxDistance = 78;
 
@@ -101,14 +105,14 @@ export const GlobeTransition = ({ onComplete }) => {
     const linesMaterial = new THREE.LineBasicMaterial({
       color: COLOR_SECONDARY_ACCENT,
       transparent: true,
-      opacity: 0.30,
+      opacity: 0.05,
       blending: THREE.AdditiveBlending
     });
 
     const linesMesh = new THREE.LineSegments(linesGeometry, linesMaterial);
     globeGroup.add(linesMesh);
 
-    // 5. Orbiting Beacons
+    // 5. Outer Orbiting Threat Beacons
     const orbitCount = 80;
     const orbitRadius = 390;
     const orbitPositions = new Float32Array(orbitCount * 3);
@@ -127,17 +131,17 @@ export const GlobeTransition = ({ onComplete }) => {
       size: 5,
       color: COLOR_SECONDARY_ACCENT,
       transparent: true,
-      opacity: 0.75,
+      opacity: 0.7,
       blending: THREE.AdditiveBlending
     });
 
     const orbitSystem = new THREE.Points(orbitGeo, orbitMat);
     globeGroup.add(orbitSystem);
 
-    // 6. 60 FPS Animation & Smooth Exponential Scale-Down into Page Position (2.0s Duration)
+    // 6. 60 FPS Render Loop: Deep Z-Axis Fly-In Motion Trajectory (2.0s Duration)
     let animationFrameId;
     const startTime = performance.now();
-    const DURATION = 2000; // 2.0s
+    const DURATION = 2000; // 2.0 seconds
 
     const easeInOutCubic = (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
@@ -153,14 +157,26 @@ export const GlobeTransition = ({ onComplete }) => {
       const eased = easeInOutCubic(progress);
 
       // Continuous 60 FPS Rotation
-      globeGroup.rotation.y += 0.007;
-      orbitSystem.rotation.y -= 0.010;
+      globeGroup.rotation.y += 0.008;
+      orbitSystem.rotation.y -= 0.011;
 
-      // Smooth Scale lerp from 1.0 -> 0.45 over the second half
-      if (progress > 0.4) {
-        const morphProgress = (progress - 0.4) / 0.6;
-        const scaleFactor = 1.0 - easeInOutCubic(morphProgress) * 0.55;
-        globeGroup.scale.set(scaleFactor, scaleFactor, scaleFactor);
+      // Deep Z-Axis Fly-In Trajectory (-1200 -> 0)
+      const flyInZ = -1200 + eased * 1200;
+      globeGroup.position.z = flyInZ;
+
+      // Brighten materials as globe flies closer
+      particlesMaterial.opacity = 0.1 + eased * 0.8;
+      linesMaterial.opacity = 0.05 + eased * 0.25;
+
+      // Scale lerp (0.1 -> 1.0 -> gently settles into 0.45 hero size over final 0.5s)
+      if (progress < 0.7) {
+        const p = progress / 0.7;
+        const s = 0.1 + easeInOutCubic(p) * 0.9;
+        globeGroup.scale.set(s, s, s);
+      } else {
+        const p = (progress - 0.7) / 0.3;
+        const s = 1.0 - easeInOutCubic(p) * 0.55;
+        globeGroup.scale.set(s, s, s);
       }
 
       renderer.render(scene, camera);
