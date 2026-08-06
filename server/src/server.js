@@ -1,3 +1,5 @@
+const path = require('path');
+const fs = require('fs');
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -40,18 +42,33 @@ if (env.NODE_ENV === 'development') {
   app.use(morgan(':method :url :status :res[content-length] - :response-time ms'));
 }
 
+// Serve static frontend assets in production (Render single-service deployment)
+const clientDistPath = path.join(__dirname, '../../client/dist');
+if (fs.existsSync(clientDistPath)) {
+  app.use(express.static(clientDistPath));
+}
+
 // Master API Routes Multiplexer
 app.use('/api/v1', routes);
 
-// Handle 404 Unmatched Routes
-app.all('*', (req, res, next) => {
+// Handle Single Page Application fallback & 404s
+app.use('*', (req, res, next) => {
+  if (req.originalUrl.startsWith('/api')) {
+    return next(new AppError(`Cannot find endpoint ${req.originalUrl} on this server`, 404, 'ROUTE_NOT_FOUND'));
+  }
+  
+  const indexPath = path.join(clientDistPath, 'index.html');
+  if (fs.existsSync(indexPath)) {
+    return res.sendFile(indexPath);
+  }
+  
   next(new AppError(`Cannot find endpoint ${req.originalUrl} on this server`, 404, 'ROUTE_NOT_FOUND'));
 });
 
 // Centralized Operational Error Handling Middleware
 app.use(errorMiddleware);
 
-const PORT = env.PORT || 5000;
+const PORT = process.env.PORT || env.PORT || 5000;
 app.listen(PORT, () => {
   logger.info(`🚀 AegisAI Cyber Defense Backend listening on port ${PORT} [Mode: ${env.NODE_ENV}]`);
 });
