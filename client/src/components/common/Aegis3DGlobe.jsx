@@ -26,7 +26,7 @@ export const Aegis3DGlobe = ({ visible = true }) => {
     const globeGroup = new THREE.Group();
     scene.add(globeGroup);
 
-    // Color Tokens Matching Uploaded Reference Frame
+    // Color Tokens Matching Reference Palette
     const COLOR_WHITE = new THREE.Color('#FFFFFF');
     const COLOR_ICE_BLUE = new THREE.Color('#E2E8F0');
     const COLOR_CYAN = new THREE.Color('#4299E1');
@@ -131,33 +131,7 @@ export const Aegis3DGlobe = ({ visible = true }) => {
     const coreNodesSystem = new THREE.Points(coreNodesGeo, coreNodesMat);
     globeGroup.add(coreNodesSystem);
 
-    // 5. Telemetry Text Sprite Helpers (Assembly HUD Callouts)
-    const createTextSprite = (textLines) => {
-      const canvas = document.createElement('canvas');
-      canvas.width = 256;
-      canvas.height = 128;
-      const ctx = canvas.getContext('2d');
-      ctx.font = '13px "JetBrains Mono", monospace';
-      ctx.fillStyle = 'rgba(207, 208, 205, 0.75)';
-      textLines.forEach((line, idx) => {
-        ctx.fillText(line, 10, 24 + idx * 20);
-      });
-      const texture = new THREE.CanvasTexture(canvas);
-      const spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true, opacity: 0.8 });
-      const sprite = new THREE.Sprite(spriteMat);
-      sprite.scale.set(160, 80, 1);
-      return sprite;
-    };
-
-    const topLeftSprite = createTextSprite(['push  %rbp', 'mov   %rsp,%rbp', 'call  0xffffffff81004580']);
-    topLeftSprite.position.set(-280, 240, 50);
-    globeGroup.add(topLeftSprite);
-
-    const bottomRightSprite = createTextSprite(['str   x29, x30, [sp]', 'mov   x29, sp', 'ldr   x0, [x19, #24]']);
-    bottomRightSprite.position.set(240, -220, 50);
-    globeGroup.add(bottomRightSprite);
-
-    // 6. Mouse Tilt Interaction Physics (Max 6 degrees tilt = 0.105 rad)
+    // 5. Mouse Tilt Interaction Physics (Max 6 degrees tilt = 0.105 rad)
     let targetRotationX = 0;
     let targetRotationY = 0;
     const maxTilt = 0.105;
@@ -190,7 +164,7 @@ export const Aegis3DGlobe = ({ visible = true }) => {
 
     window.addEventListener('resize', handleResize);
 
-    // 7. 60 FPS Render Loop with Continuous Rotation
+    // 6. 60 FPS Render Loop with Continuous Rotation
     let animationFrameId;
     let isTabActive = true;
 

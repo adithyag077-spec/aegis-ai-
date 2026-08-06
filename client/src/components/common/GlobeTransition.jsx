@@ -39,7 +39,7 @@ export const GlobeTransition = ({ onComplete }) => {
     const TARGET_Z = 0;
     globeGroup.position.z = START_Z;
 
-    // Color Tokens Matching Uploaded Reference Frame
+    // Color Tokens Matching Reference Palette
     const COLOR_WHITE = new THREE.Color('#FFFFFF');
     const COLOR_ICE_BLUE = new THREE.Color('#E2E8F0');
     const COLOR_CYAN = new THREE.Color('#4299E1');
@@ -144,33 +144,7 @@ export const GlobeTransition = ({ onComplete }) => {
     const coreNodesSystem = new THREE.Points(coreNodesGeo, coreNodesMat);
     globeGroup.add(coreNodesSystem);
 
-    // 5. Telemetry Text Sprite Helpers (Assembly HUD Callouts)
-    const createTextSprite = (textLines) => {
-      const canvas = document.createElement('canvas');
-      canvas.width = 256;
-      canvas.height = 128;
-      const ctx = canvas.getContext('2d');
-      ctx.font = '13px "JetBrains Mono", monospace';
-      ctx.fillStyle = 'rgba(207, 208, 205, 0.75)';
-      textLines.forEach((line, idx) => {
-        ctx.fillText(line, 10, 24 + idx * 20);
-      });
-      const texture = new THREE.CanvasTexture(canvas);
-      const spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true, opacity: 0.0 });
-      const sprite = new THREE.Sprite(spriteMat);
-      sprite.scale.set(160, 80, 1);
-      return { sprite, material: spriteMat };
-    };
-
-    const topLeftHUD = createTextSprite(['push  %rbp', 'mov   %rsp,%rbp', 'call  0xffffffff81004580']);
-    topLeftHUD.sprite.position.set(-280, 240, 50);
-    globeGroup.add(topLeftHUD.sprite);
-
-    const bottomRightHUD = createTextSprite(['str   x29, x30, [sp]', 'mov   x29, sp', 'ldr   x0, [x19, #24]']);
-    bottomRightHUD.sprite.position.set(240, -220, 50);
-    globeGroup.add(bottomRightHUD.sprite);
-
-    // 6. Satellite Docking Depth Motion: easeOutQuint (1 - (1 - progress)^5)
+    // 5. Satellite Docking Depth Motion: easeOutQuint (1 - (1 - progress)^5)
     let animationFrameId;
     let lastTime = performance.now();
     const startTime = performance.now();
@@ -191,8 +165,6 @@ export const GlobeTransition = ({ onComplete }) => {
         particlesMaterial.opacity = 0.95;
         coreTorusMat.opacity = 0.85;
         coreNodesMat.opacity = 0.95;
-        topLeftHUD.material.opacity = 0.80;
-        bottomRightHUD.material.opacity = 0.80;
         renderer.render(scene, camera);
         if (onComplete) onComplete();
         return;
@@ -214,8 +186,6 @@ export const GlobeTransition = ({ onComplete }) => {
       particlesMaterial.opacity = eased * 0.95;
       coreTorusMat.opacity = eased * 0.85;
       coreNodesMat.opacity = eased * 0.95;
-      topLeftHUD.material.opacity = eased * 0.80;
-      bottomRightHUD.material.opacity = eased * 0.80;
 
       renderer.render(scene, camera);
       animationFrameId = requestAnimationFrame(animate);
@@ -245,8 +215,6 @@ export const GlobeTransition = ({ onComplete }) => {
       coreTorusMat.dispose();
       coreNodesGeo.dispose();
       coreNodesMat.dispose();
-      topLeftHUD.material.dispose();
-      bottomRightHUD.material.dispose();
       renderer.dispose();
     };
   }, [onComplete]);
