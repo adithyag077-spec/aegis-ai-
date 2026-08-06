@@ -7,21 +7,21 @@ export const AegisBootIntro = ({ onComplete }) => {
   const [finished, setFinished] = useState(false);
 
   useEffect(() => {
-    // Hard fallback safety timer: Guarantee completion at exactly 4.0 seconds under ALL circumstances
+    // Hard fallback safety timer: Guarantee completion at exactly 6.0 seconds under ALL circumstances
     const hardFallback = setTimeout(() => {
       setFinished(true);
       if (onComplete) onComplete();
-    }, 4000);
+    }, 6000);
 
-    // Timed Phase Sequence (Accelerated by 1.0s to 4.0s total)
-    const t1 = setTimeout(() => setPhase(1), 700);  // 0.7s: Particle Shield Assembly
-    const t2 = setTimeout(() => setPhase(2), 1600); // 1.6s: Cinematic Text Reveal
-    const t3 = setTimeout(() => setPhase(3), 2500); // 2.5s: Telemetry Radar Sweep
-    const t4 = setTimeout(() => setPhase(4), 3300); // 3.3s: Fly-Through & Compress
+    // Timed Phase Sequence (Extended by 2.0s to 6.0s total for natural, cinematic pacing)
+    const t1 = setTimeout(() => setPhase(1), 1200); // 1.2s: Particle Shield Assembly
+    const t2 = setTimeout(() => setPhase(2), 2500); // 2.5s: Cinematic Text Reveal
+    const t3 = setTimeout(() => setPhase(3), 4000); // 4.0s: Telemetry Radar Sweep
+    const t4 = setTimeout(() => setPhase(4), 5200); // 5.2s: Fly-Through & Compress
     const t5 = setTimeout(() => {
       setFinished(true);
       if (onComplete) onComplete();
-    }, 4000); // 4.0s: 0ms Handoff to Landing Page Reveal
+    }, 6000); // 6.0s: 0ms Handoff to Globe & Landing Page Reveal
 
     return () => {
       clearTimeout(hardFallback);
@@ -42,7 +42,7 @@ export const AegisBootIntro = ({ onComplete }) => {
         initial={{ opacity: 1 }}
         animate={{ opacity: phase === 4 ? 0 : 1 }}
         exit={{ opacity: 0 }}
-        transition={{ duration: phase === 4 ? 0.6 : 0.3, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: phase === 4 ? 0.8 : 0.4, ease: [0.22, 1, 0.36, 1] }}
         className="fixed inset-0 z-[99999] bg-[#0D1117] flex flex-col items-center justify-center overflow-hidden pointer-events-auto"
       >
         {/* Ambient Grid (3% Opacity) */}
@@ -58,7 +58,7 @@ export const AegisBootIntro = ({ onComplete }) => {
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: phase >= 4 ? 0.1 : 1.2, opacity: phase >= 4 ? 1 : 0.4 }}
-          transition={{ duration: phase === 4 ? 0.6 : 0.9, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: phase === 4 ? 0.8 : 1.4, ease: [0.22, 1, 0.36, 1] }}
           className="absolute w-[500px] h-[500px] rounded-full blur-[120px] pointer-events-none"
           style={{
             background: 'radial-gradient(circle, rgba(138, 153, 146, 0.5) 0%, rgba(85, 68, 58, 0.3) 50%, transparent 80%)'
@@ -89,9 +89,9 @@ export const AegisBootIntro = ({ onComplete }) => {
                   scale: phase >= 4 ? 0.1 : (phase >= 1 ? 1 : 0.5)
                 }}
                 transition={{
-                  duration: phase === 4 ? 0.5 : 0.8,
+                  duration: phase === 4 ? 0.8 : 1.2,
                   ease: [0.22, 1, 0.36, 1],
-                  delay: (i % 20) * 0.008
+                  delay: (i % 20) * 0.012
                 }}
                 className="absolute w-1.5 h-1.5 rounded-full bg-[#8A9992] shadow-[0_0_8px_#55443A]"
               />
@@ -107,7 +107,7 @@ export const AegisBootIntro = ({ onComplete }) => {
               scale: phase === 4 ? 18 : (phase >= 1 ? 1 : 0.7), 
               opacity: phase === 4 ? [1, 0.8, 0] : (phase >= 1 ? 1 : 0.4)
             }}
-            transition={{ duration: phase === 4 ? 0.6 : 0.7, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: phase === 4 ? 0.8 : 0.9, ease: [0.22, 1, 0.36, 1] }}
             className="relative flex items-center justify-center"
           >
             {/* Animated Scanning Radar Rings */}
@@ -116,13 +116,13 @@ export const AegisBootIntro = ({ onComplete }) => {
                 <motion.div
                   initial={{ scale: 0.8, opacity: 0.8 }}
                   animate={{ scale: 1.6, opacity: 0 }}
-                  transition={{ duration: 1.2, repeat: Infinity, ease: 'easeOut' }}
+                  transition={{ duration: 1.6, repeat: Infinity, ease: 'easeOut' }}
                   className="absolute w-28 h-28 rounded-full border border-[#8A9992]/60 pointer-events-none"
                 />
                 <motion.div
                   initial={{ rotate: 0 }}
                   animate={{ rotate: 360 }}
-                  transition={{ duration: 2.5, repeat: Infinity, ease: 'linear' }}
+                  transition={{ duration: 3.5, repeat: Infinity, ease: 'linear' }}
                   className="absolute w-36 h-36 rounded-full border border-dashed border-[#55443A]/40 pointer-events-none"
                 />
               </>
@@ -136,10 +136,10 @@ export const AegisBootIntro = ({ onComplete }) => {
           {/* Cinematic Text Reveal */}
           {phase >= 2 && phase < 4 && (
             <motion.div
-              initial={{ opacity: 0, y: 12, filter: 'blur(8px)' }}
+              initial={{ opacity: 0, y: 14, filter: 'blur(8px)' }}
               animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
               exit={{ opacity: 0, y: -8, filter: 'blur(4px)' }}
-              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
               className="text-center space-y-2 font-mono"
             >
               <h1 className="text-3xl sm:text-4xl font-extrabold text-[#CFD0CD] font-heading tracking-[0.25em] uppercase drop-shadow-[0_0_12px_rgba(138,153,146,0.4)]">
