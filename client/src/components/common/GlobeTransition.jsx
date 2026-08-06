@@ -6,7 +6,6 @@ export const GlobeTransition = ({ onComplete }) => {
   const mountRef = useRef(null);
 
   useEffect(() => {
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const container = mountRef.current;
     if (!container) {
       if (onComplete) onComplete();
@@ -16,7 +15,7 @@ export const GlobeTransition = ({ onComplete }) => {
     const width = container.clientWidth || window.innerWidth;
     const height = container.clientHeight || window.innerHeight;
 
-    // 1. Three.js Scene Setup (Transparent WebGL Canvas overlay)
+    // 1. Three.js Scene & Perspective Camera Setup (Focal Plane)
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(55, width / height, 1, 2000);
     camera.position.z = 1000;
@@ -30,17 +29,21 @@ export const GlobeTransition = ({ onComplete }) => {
     const globeGroup = new THREE.Group();
     scene.add(globeGroup);
 
-    // Initial position behind page in Z-space (-600px) and start scale (0.20)
-    globeGroup.position.z = -600;
-    globeGroup.scale.set(0.20, 0.20, 0.20);
+    // CONSTANT SCALE = 1.0 (NO scale animation per specification)
+    globeGroup.scale.set(1.0, 1.0, 1.0);
+
+    // INITIAL POSITION Z: Deep behind camera plane (-25 units -> converts to -500 THREE units relative to camera)
+    const START_Z = -500;
+    const TARGET_Z = 0;
+    globeGroup.position.z = START_Z;
 
     // 2. Color Palette Tokens
     const COLOR_PRIMARY_ACCENT = new THREE.Color('#55443A'); // Liver Chestnut
     const COLOR_SECONDARY_ACCENT = new THREE.Color('#8A9992'); // Morning Blue
     const COLOR_SURFACE = new THREE.Color('#4D2308'); // Arsenic
 
-    // 3. Glowing Wireframe Sphere (1,200 Particles)
-    const particleCount = window.innerWidth < 768 ? 500 : 1200;
+    // 3. Glowing 3D Wireframe Sphere (Identical Mesh Structure to Landing Page)
+    const particleCount = window.innerWidth < 768 ? 400 : 1200;
     const radius = 320;
     const positions = new Float32Array(particleCount * 3);
     const colors = new Float32Array(particleCount * 3);
@@ -74,14 +77,14 @@ export const GlobeTransition = ({ onComplete }) => {
       size: 3.5,
       vertexColors: true,
       transparent: true,
-      opacity: 0.15,
+      opacity: 0.0, // Fades 0.0 -> 0.85
       blending: THREE.AdditiveBlending
     });
 
     const particleSystem = new THREE.Points(particlesGeometry, particlesMaterial);
     globeGroup.add(particleSystem);
 
-    // 4. Connecting Neural Line Segments
+    // 4. Connecting Neural Mesh Lines
     const linePositions = [];
     const maxDistance = 75;
 
@@ -105,7 +108,7 @@ export const GlobeTransition = ({ onComplete }) => {
     const linesMaterial = new THREE.LineBasicMaterial({
       color: COLOR_SECONDARY_ACCENT,
       transparent: true,
-      opacity: 0.08,
+      opacity: 0.0, // Fades 0.0 -> 0.22
       blending: THREE.AdditiveBlending
     });
 
@@ -131,45 +134,51 @@ export const GlobeTransition = ({ onComplete }) => {
       size: 5,
       color: COLOR_SECONDARY_ACCENT,
       transparent: true,
-      opacity: 0.7,
+      opacity: 0.0, // Fades 0.0 -> 0.70
       blending: THREE.AdditiveBlending
     });
 
     const orbitSystem = new THREE.Points(orbitGeo, orbitMat);
     globeGroup.add(orbitSystem);
 
-    // 6. Physically Based Smoothstep Glide Trajectory: smoothstep(t) = t * t * (3 - 2 * t)
+    // 6. Delta-Time rAF Loop with easeOutQuint (1 - (1 - progress)^5) Pure Z-Axis Translation
     let animationFrameId;
+    let lastTime = performance.now();
     const startTime = performance.now();
     const DURATION = 2000; // 2.0s
 
-    const smoothstep = (t) => t * t * (3 - 2 * t);
+    const easeOutQuint = (t) => 1 - Math.pow(1 - t, 5);
 
     const animate = (currentTime) => {
+      const delta = (currentTime - lastTime) / 1000;
+      lastTime = currentTime;
+
       const elapsed = currentTime - startTime;
 
       if (elapsed >= DURATION) {
+        globeGroup.position.z = TARGET_Z;
+        particlesMaterial.opacity = 0.85;
+        linesMaterial.opacity = 0.22;
+        orbitMat.opacity = 0.70;
+        renderer.render(scene, camera);
         if (onComplete) onComplete();
         return;
       }
 
       const progress = Math.min(elapsed / DURATION, 1.0);
-      const smoothed = smoothstep(progress);
+      const eased = easeOutQuint(progress);
 
       // Continuous 60 FPS Rotation
-      globeGroup.rotation.y += 0.006;
-      orbitSystem.rotation.y -= 0.009;
+      globeGroup.rotation.y += 0.0023;
+      orbitSystem.rotation.y -= 0.0035;
 
-      // Smoothstep Z-axis glide (-600 -> 0.0)
-      globeGroup.position.z = -600 + smoothed * 600;
+      // Pure Z-Axis Translation (-500 -> 0.0)
+      globeGroup.position.z = START_Z + eased * (TARGET_Z - START_Z);
 
-      // Smoothstep scale lerp (0.20 -> 0.45 target hero scale)
-      const scaleVal = 0.20 + smoothed * 0.25;
-      globeGroup.scale.set(scaleVal, scaleVal, scaleVal);
-
-      // Material opacities brighten smoothly as globe glides into position
-      particlesMaterial.opacity = 0.15 + smoothed * 0.70;
-      linesMaterial.opacity = 0.08 + smoothed * 0.14;
+      // Smooth Opacity Fade (0.0 -> 1.0 target)
+      particlesMaterial.opacity = eased * 0.85;
+      linesMaterial.opacity = eased * 0.22;
+      orbitMat.opacity = eased * 0.70;
 
       renderer.render(scene, camera);
       animationFrameId = requestAnimationFrame(animate);
@@ -202,7 +211,7 @@ export const GlobeTransition = ({ onComplete }) => {
       initial={{ opacity: 1 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.3 }}
+      transition={{ duration: 0.2 }}
       className="fixed inset-0 z-[99998] pointer-events-none flex items-center justify-center bg-transparent"
     >
       <div ref={mountRef} className="w-full h-full flex items-center justify-center" />
