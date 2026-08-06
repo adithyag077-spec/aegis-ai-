@@ -1,4 +1,4 @@
-import React, { lazy, Suspense } from 'react';
+import React, { lazy, Suspense, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ThreatProvider } from './context/ThreatContext';
@@ -46,6 +46,7 @@ import { PageTransition } from './components/common/PageTransition';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { AmbientCursorGlow } from './components/common/AmbientCursorGlow';
 import { AegisBootIntro } from './components/common/AegisBootIntro';
+import { GlobeTransition } from './components/common/GlobeTransition';
 import { AegisParticles } from './components/common/AegisParticles';
 
 // Page Loading Suspense Fallback
@@ -59,7 +60,7 @@ const PageFallback = () => (
 // Main App Layout Wrapper
 const AppLayout = () => {
   return (
-    <div className="min-h-screen flex flex-col bg-[#0d0b08] text-[#f2e8d8] antialiased selection:bg-[#d98a3d]/30 selection:text-[#d98a3d] relative">
+    <div className="min-h-screen flex flex-col bg-[#0D1117] text-[#CFD0CD] antialiased selection:bg-[#55443A]/40 selection:text-[#CFD0CD] relative">
       <AegisParticles count={150} />
       <AmbientCursorGlow />
       <Navbar />
@@ -81,13 +82,22 @@ const AppLayout = () => {
 };
 
 export default function App() {
+  const [startupStep, setStartupStep] = useState('INTRO'); // INTRO -> GLOBE_TRANSITION -> READY
+
   return (
     <ThemeProvider>
       <AuthProvider>
         <ThreatProvider>
           <ToastProvider>
             <BrowserRouter>
-              <AegisBootIntro />
+              {/* Startup Sequence: Intro -> 0ms -> GlobeTransition (2s) -> LandingPage */}
+              {startupStep === 'INTRO' && (
+                <AegisBootIntro onComplete={() => setStartupStep('GLOBE_TRANSITION')} />
+              )}
+              {startupStep === 'GLOBE_TRANSITION' && (
+                <GlobeTransition onComplete={() => setStartupStep('READY')} />
+              )}
+
               <Suspense fallback={<PageFallback />}>
                 <Routes>
                   {/* Public Guest Routes */}
