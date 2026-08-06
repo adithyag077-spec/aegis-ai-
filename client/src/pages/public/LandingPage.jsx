@@ -5,7 +5,7 @@ import { Shield, ArrowRight, Sparkles, Terminal, Activity, Lock, Cpu } from 'luc
 import { WarpOverlay } from '../../components/common/WarpOverlay';
 import { Aegis3DGlobe } from '../../components/common/Aegis3DGlobe';
 
-export const LandingPage = ({ isGlobeVisible = true }) => {
+export const LandingPage = ({ isGlobeVisible = true, isHeroRevealed = true }) => {
   const navigate = useNavigate();
   const [isWarping, setIsWarping] = useState(false);
 
@@ -33,23 +33,34 @@ export const LandingPage = ({ isGlobeVisible = true }) => {
     }, 700);
   };
 
-  // Apple / OpenAI Style Staggered Blur Reveal Animation Container
+  // Header Nav Drop & Fade Variant (Order #1 & #7)
+  const navVariants = {
+    hidden: { opacity: 0, y: -24, filter: 'blur(8px)' },
+    visible: {
+      opacity: 1,
+      y: 0,
+      filter: 'blur(0px)',
+      transition: { duration: 0.6, delay: 0.0, ease: [0.22, 1, 0.36, 1] }
+    }
+  };
+
+  // Apple / OpenAI Style Staggered Blur Reveal Animation Container (100ms Stagger)
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: { 
-        staggerChildren: 0.12, 
-        delayChildren: 0.15 
+        staggerChildren: 0.10, 
+        delayChildren: 0.10 
       }
     }
   };
 
-  // Apple / OpenAI Style Individual Item Blur Reveal Variant
+  // Individual Hero Element Drop & Fade Variant (Badge -> Title -> Description -> Buttons -> Jarvis Matrix Card)
   const itemVariants = {
     hidden: { 
       opacity: 0, 
-      y: 24, 
+      y: -24, 
       scale: 0.98,
       filter: 'blur(10px)'
     },
@@ -59,7 +70,7 @@ export const LandingPage = ({ isGlobeVisible = true }) => {
       scale: 1,
       filter: 'blur(0px)',
       transition: { 
-        duration: 0.65, 
+        duration: 0.60, 
         ease: [0.22, 1, 0.36, 1] 
       } 
     }
@@ -67,17 +78,17 @@ export const LandingPage = ({ isGlobeVisible = true }) => {
 
   return (
     <div className="min-h-screen gradient-ambient text-[#CFD0CD] flex flex-col justify-between selection:bg-[#55443A]/40 selection:text-[#CFD0CD] relative overflow-hidden bg-[#0D1117]">
-      {/* Interactive 3D Dune Neural Globe Background (Controlled by isGlobeVisible prop) */}
+      {/* Interactive 3D Dune Neural Globe Background */}
       <Aegis3DGlobe visible={isGlobeVisible} />
 
       {/* 3D Warp Shutter Overlay */}
       <WarpOverlay show={isWarping} />
 
-      {/* Header Navigation */}
+      {/* 1. Navigation Bar (Enters smoothly after Globe Settles) */}
       <motion.header 
-        initial={{ opacity: 0, y: -12, filter: 'blur(6px)' }}
-        animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        initial="hidden"
+        animate={isHeroRevealed ? "visible" : "hidden"}
+        variants={navVariants}
         className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full py-6 flex items-center justify-between relative z-10"
       >
         <div className="flex items-center gap-3">
@@ -103,31 +114,31 @@ export const LandingPage = ({ isGlobeVisible = true }) => {
         </div>
       </motion.header>
 
-      {/* Hero Section with Cinematic Staggered Blur Reveal */}
+      {/* Hero Section with Staggered 100ms Reveal Sequence */}
       <motion.main 
         variants={containerVariants}
         initial="hidden"
-        animate="visible"
+        animate={isHeroRevealed ? "visible" : "hidden"}
         className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full py-16 flex flex-col md:flex-row items-center justify-between gap-12 relative z-10"
       >
         <div className="space-y-6 max-w-2xl">
-          {/* 1. Autonomous AI Cyber Shield Badge */}
+          {/* 2. Autonomous AI Cyber Shield Badge */}
           <motion.div variants={itemVariants} className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full neu-inset text-[#CFD0CD] border border-[rgba(138,153,146,0.25)] text-xs font-mono font-bold bg-[#4D2308]">
             <Sparkles className="w-3.5 h-3.5 text-[#8A9992]" />
             <span>AUTONOMOUS AI CYBER SHIELD • POWERED BY GOOGLE GEMINI</span>
           </motion.div>
 
-          {/* 2. Main Hero Heading */}
+          {/* 3. Main Hero Heading */}
           <motion.h1 variants={itemVariants} className="text-4xl sm:text-6xl font-extrabold tracking-tight leading-tight font-heading">
             Enterprise AI <span className="gradient-text-hero">Threat Detection</span> & Identity Defense
           </motion.h1>
 
-          {/* 3. Description Text */}
+          {/* 4. Description Text */}
           <motion.p variants={itemVariants} className="text-sm sm:text-base text-[#B8BBB7] leading-relaxed font-sans max-w-xl">
             Next-generation Security Operations Center fusing real-time multi-vector threat scanning, MITRE ATT&CK kill-chain mapping, and autonomous AI remediation playbooks.
           </motion.p>
 
-          {/* 4. Action Buttons */}
+          {/* 5. Primary Action Buttons */}
           <motion.div variants={itemVariants} className="flex items-center gap-4 pt-4 font-mono text-xs">
             <Link
               to="/app/dashboard"
@@ -147,7 +158,7 @@ export const LandingPage = ({ isGlobeVisible = true }) => {
           </motion.div>
         </div>
 
-        {/* 5. JARVIS Matrix Information Card */}
+        {/* 6. JARVIS Matrix Information Card */}
         <motion.div 
           variants={itemVariants}
           className={`relative w-full max-w-md h-80 neu-raised p-6 rounded-[28px] flex items-center justify-center overflow-hidden border border-[rgba(138,153,146,0.25)] transition-transform duration-500 bg-[#55443A] ${

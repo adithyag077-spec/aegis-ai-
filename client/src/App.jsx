@@ -100,8 +100,16 @@ export default function App() {
 
               <Suspense fallback={<PageFallback />}>
                 <Routes>
-                  {/* Public Guest Routes - Globe is hidden during startup sequence until READY */}
-                  <Route path="/" element={<LandingPage isGlobeVisible={startupStep === 'READY'} />} />
+                  {/* Public Guest Routes - Staggered Reveal triggers when GlobeTransition completes */}
+                  <Route
+                    path="/"
+                    element={
+                      <LandingPage
+                        isGlobeVisible={startupStep === 'READY'}
+                        isHeroRevealed={startupStep === 'READY'}
+                      />
+                    }
+                  />
                   <Route path="/login" element={<LoginPage />} />
                   <Route path="/register" element={<RegisterPage />} />
 
