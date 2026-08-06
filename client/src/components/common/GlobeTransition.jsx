@@ -30,9 +30,9 @@ export const GlobeTransition = ({ onComplete }) => {
     const globeGroup = new THREE.Group();
     scene.add(globeGroup);
 
-    // Initial position behind page in Z-axis (-800px) and start scale (0.15)
-    globeGroup.position.z = -800;
-    globeGroup.scale.set(0.15, 0.15, 0.15);
+    // Initial position behind page in Z-space (-600px) and start scale (0.20)
+    globeGroup.position.z = -600;
+    globeGroup.scale.set(0.20, 0.20, 0.20);
 
     // 2. Color Palette Tokens
     const COLOR_PRIMARY_ACCENT = new THREE.Color('#55443A'); // Liver Chestnut
@@ -74,7 +74,7 @@ export const GlobeTransition = ({ onComplete }) => {
       size: 3.5,
       vertexColors: true,
       transparent: true,
-      opacity: 0.1,
+      opacity: 0.15,
       blending: THREE.AdditiveBlending
     });
 
@@ -105,7 +105,7 @@ export const GlobeTransition = ({ onComplete }) => {
     const linesMaterial = new THREE.LineBasicMaterial({
       color: COLOR_SECONDARY_ACCENT,
       transparent: true,
-      opacity: 0.05,
+      opacity: 0.08,
       blending: THREE.AdditiveBlending
     });
 
@@ -138,12 +138,12 @@ export const GlobeTransition = ({ onComplete }) => {
     const orbitSystem = new THREE.Points(orbitGeo, orbitMat);
     globeGroup.add(orbitSystem);
 
-    // 6. Monotonic Spacecraft Docking Trajectory: easeOutCubic (1 - (1 - progress)^3)
+    // 6. Physically Based Smoothstep Glide Trajectory: smoothstep(t) = t * t * (3 - 2 * t)
     let animationFrameId;
     const startTime = performance.now();
     const DURATION = 2000; // 2.0s
 
-    const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+    const smoothstep = (t) => t * t * (3 - 2 * t);
 
     const animate = (currentTime) => {
       const elapsed = currentTime - startTime;
@@ -154,22 +154,22 @@ export const GlobeTransition = ({ onComplete }) => {
       }
 
       const progress = Math.min(elapsed / DURATION, 1.0);
-      const eased = easeOutCubic(progress);
+      const smoothed = smoothstep(progress);
 
       // Continuous 60 FPS Rotation
       globeGroup.rotation.y += 0.006;
       orbitSystem.rotation.y -= 0.009;
 
-      // Monotonic Z-axis fly-in (-800 -> 0.0)
-      globeGroup.position.z = -800 + eased * 800;
+      // Smoothstep Z-axis glide (-600 -> 0.0)
+      globeGroup.position.z = -600 + smoothed * 600;
 
-      // Monotonic scale lerp (0.15 -> 0.45 target hero scale)
-      const scaleVal = 0.15 + eased * 0.30;
+      // Smoothstep scale lerp (0.20 -> 0.45 target hero scale)
+      const scaleVal = 0.20 + smoothed * 0.25;
       globeGroup.scale.set(scaleVal, scaleVal, scaleVal);
 
-      // Material opacities brighten smoothly as globe docks
-      particlesMaterial.opacity = 0.1 + eased * 0.75;
-      linesMaterial.opacity = 0.05 + eased * 0.17;
+      // Material opacities brighten smoothly as globe glides into position
+      particlesMaterial.opacity = 0.15 + smoothed * 0.70;
+      linesMaterial.opacity = 0.08 + smoothed * 0.14;
 
       renderer.render(scene, camera);
       animationFrameId = requestAnimationFrame(animate);
