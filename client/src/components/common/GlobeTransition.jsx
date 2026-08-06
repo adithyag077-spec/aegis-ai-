@@ -39,29 +39,43 @@ export const GlobeTransition = ({ onComplete }) => {
     const TARGET_Z = 0;
     globeGroup.position.z = START_Z;
 
-    // 2. Glowing White/Cyan Holographic Color Palette Tokens
+    // Color Tokens Matching Uploaded Reference Frame
     const COLOR_WHITE = new THREE.Color('#FFFFFF');
-    const COLOR_ALMOND_LIGHT = new THREE.Color('#CFD0CD');
+    const COLOR_ICE_BLUE = new THREE.Color('#E2E8F0');
+    const COLOR_CYAN = new THREE.Color('#4299E1');
     const COLOR_MORNING_BLUE = new THREE.Color('#8A9992');
-    const COLOR_CORE_GLOW = new THREE.Color('#55443A');
+    const COLOR_MAGENTA_ACCENT = new THREE.Color('#D53F8C');
 
-    // 3. Inner Volumetric Glowing Core Sphere (Soft Additive Core Bloom)
-    const coreGeo = new THREE.SphereGeometry(180, 32, 32);
-    const coreMat = new THREE.MeshBasicMaterial({
-      color: COLOR_CORE_GLOW,
+    // 2. Outer Geodesic Wireframe Lattice (Icosahedron Detail 2)
+    const geoGridGeometry = new THREE.IcosahedronGeometry(340, 2);
+    const wireframeGeo = new THREE.WireframeGeometry(geoGridGeometry);
+    const geoGridMaterial = new THREE.LineBasicMaterial({
+      color: COLOR_MORNING_BLUE,
+      transparent: true,
+      opacity: 0.0, // Fades 0.0 -> 0.28
+      blending: THREE.AdditiveBlending
+    });
+    const geoGridMesh = new THREE.LineSegments(wireframeGeo, geoGridMaterial);
+    globeGroup.add(geoGridMesh);
+
+    // Bottom-Left Magenta Accent Edge Highlight
+    const accentGeo = new THREE.IcosahedronGeometry(342, 1);
+    const accentWire = new THREE.WireframeGeometry(accentGeo);
+    const accentMat = new THREE.LineBasicMaterial({
+      color: COLOR_MAGENTA_ACCENT,
       transparent: true,
       opacity: 0.0, // Fades 0.0 -> 0.35
       blending: THREE.AdditiveBlending
     });
-    const coreMesh = new THREE.Mesh(coreGeo, coreMat);
-    globeGroup.add(coreMesh);
+    const accentMesh = new THREE.LineSegments(accentWire, accentMat);
+    accentMesh.rotation.z = Math.PI / 4;
+    globeGroup.add(accentMesh);
 
-    // 4. Dense Spherical Particle Cloud (3,000 Neural Nodes)
-    const particleCount = window.innerWidth < 768 ? 1000 : 3000;
-    const radius = 320;
+    // 3. Dense Concentric Particle Shell (3,500 Particles)
+    const particleCount = window.innerWidth < 768 ? 1200 : 3500;
+    const radius = 330;
     const positions = new Float32Array(particleCount * 3);
     const colors = new Float32Array(particleCount * 3);
-    const nodeCoords = [];
 
     for (let i = 0; i < particleCount; i++) {
       const phi = Math.acos(-1 + (2 * i) / particleCount);
@@ -75,10 +89,8 @@ export const GlobeTransition = ({ onComplete }) => {
       positions[i * 3 + 1] = y;
       positions[i * 3 + 2] = z;
 
-      nodeCoords.push({ x, y, z });
-
-      const randVal = Math.random();
-      const c = randVal > 0.6 ? COLOR_WHITE : (randVal > 0.3 ? COLOR_ALMOND_LIGHT : COLOR_MORNING_BLUE);
+      const rand = Math.random();
+      const c = rand > 0.65 ? COLOR_WHITE : (rand > 0.35 ? COLOR_ICE_BLUE : (rand > 0.1 ? COLOR_CYAN : COLOR_MORNING_BLUE));
       colors[i * 3] = c.r;
       colors[i * 3 + 1] = c.g;
       colors[i * 3 + 2] = c.b;
@@ -92,71 +104,73 @@ export const GlobeTransition = ({ onComplete }) => {
       size: 3.2,
       vertexColors: true,
       transparent: true,
-      opacity: 0.0, // Fades 0.0 -> 0.90
+      opacity: 0.0, // Fades 0.0 -> 0.95
       blending: THREE.AdditiveBlending
     });
 
     const particleSystem = new THREE.Points(particlesGeometry, particlesMaterial);
     globeGroup.add(particleSystem);
 
-    // 5. Connecting Neural Line Segments
-    const linePositions = [];
-    const maxDistance = 65;
-
-    for (let i = 0; i < particleCount; i += 2) {
-      for (let j = i + 1; j < particleCount; j += 2) {
-        const dx = nodeCoords[i].x - nodeCoords[j].x;
-        const dy = nodeCoords[i].y - nodeCoords[j].y;
-        const dz = nodeCoords[i].z - nodeCoords[j].z;
-        const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
-
-        if (dist < maxDistance) {
-          linePositions.push(nodeCoords[i].x, nodeCoords[i].y, nodeCoords[i].z);
-          linePositions.push(nodeCoords[j].x, nodeCoords[j].y, nodeCoords[j].z);
-        }
-      }
-    }
-
-    const linesGeometry = new THREE.BufferGeometry();
-    linesGeometry.setAttribute('position', new THREE.Float32BufferAttribute(linePositions, 3));
-
-    const linesMaterial = new THREE.LineBasicMaterial({
-      color: COLOR_MORNING_BLUE,
+    // 4. Central Organic Core Loop & Core Node Callouts
+    const coreTorusGeo = new THREE.TorusGeometry(85, 2.2, 16, 64);
+    const coreTorusMat = new THREE.LineBasicMaterial({
+      color: COLOR_WHITE,
       transparent: true,
-      opacity: 0.0, // Fades 0.0 -> 0.25
+      opacity: 0.0, // Fades 0.0 -> 0.85
       blending: THREE.AdditiveBlending
     });
+    const coreTorusMesh = new THREE.LineLoop(coreTorusGeo, coreTorusMat);
+    coreTorusMesh.rotation.x = Math.PI / 6;
+    globeGroup.add(coreTorusMesh);
 
-    const linesMesh = new THREE.LineSegments(linesGeometry, linesMaterial);
-    globeGroup.add(linesMesh);
-
-    // 6. Outer Orbiting Threat Beacons
-    const orbitCount = 120;
-    const orbitRadius = 390;
-    const orbitPositions = new Float32Array(orbitCount * 3);
-
-    for (let i = 0; i < orbitCount; i++) {
-      const angle = (i / orbitCount) * Math.PI * 2;
-      orbitPositions[i * 3] = Math.cos(angle) * orbitRadius;
-      orbitPositions[i * 3 + 1] = (Math.random() - 0.5) * 90;
-      orbitPositions[i * 3 + 2] = Math.sin(angle) * orbitRadius;
+    // Pulsing Central Core Node Spots
+    const coreNodesCount = 6;
+    const coreNodesPositions = new Float32Array(coreNodesCount * 3);
+    for (let i = 0; i < coreNodesCount; i++) {
+      const angle = (i / coreNodesCount) * Math.PI * 2;
+      coreNodesPositions[i * 3] = Math.cos(angle) * 75;
+      coreNodesPositions[i * 3 + 1] = Math.sin(angle) * 75;
+      coreNodesPositions[i * 3 + 2] = (Math.random() - 0.5) * 20;
     }
-
-    const orbitGeo = new THREE.BufferGeometry();
-    orbitGeo.setAttribute('position', new THREE.BufferAttribute(orbitPositions, 3));
-
-    const orbitMat = new THREE.PointsMaterial({
-      size: 4.5,
-      color: COLOR_ALMOND_LIGHT,
+    const coreNodesGeo = new THREE.BufferGeometry();
+    coreNodesGeo.setAttribute('position', new THREE.BufferAttribute(coreNodesPositions, 3));
+    const coreNodesMat = new THREE.PointsMaterial({
+      size: 7,
+      color: COLOR_WHITE,
       transparent: true,
-      opacity: 0.0, // Fades 0.0 -> 0.75
+      opacity: 0.0, // Fades 0.0 -> 0.95
       blending: THREE.AdditiveBlending
     });
+    const coreNodesSystem = new THREE.Points(coreNodesGeo, coreNodesMat);
+    globeGroup.add(coreNodesSystem);
 
-    const orbitSystem = new THREE.Points(orbitGeo, orbitMat);
-    globeGroup.add(orbitSystem);
+    // 5. Telemetry Text Sprite Helpers (Assembly HUD Callouts)
+    const createTextSprite = (textLines) => {
+      const canvas = document.createElement('canvas');
+      canvas.width = 256;
+      canvas.height = 128;
+      const ctx = canvas.getContext('2d');
+      ctx.font = '13px "JetBrains Mono", monospace';
+      ctx.fillStyle = 'rgba(207, 208, 205, 0.75)';
+      textLines.forEach((line, idx) => {
+        ctx.fillText(line, 10, 24 + idx * 20);
+      });
+      const texture = new THREE.CanvasTexture(canvas);
+      const spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true, opacity: 0.0 });
+      const sprite = new THREE.Sprite(spriteMat);
+      sprite.scale.set(160, 80, 1);
+      return { sprite, material: spriteMat };
+    };
 
-    // 7. Satellite Docking Depth Motion: easeOutQuint (1 - (1 - progress)^5)
+    const topLeftHUD = createTextSprite(['push  %rbp', 'mov   %rsp,%rbp', 'call  0xffffffff81004580']);
+    topLeftHUD.sprite.position.set(-280, 240, 50);
+    globeGroup.add(topLeftHUD.sprite);
+
+    const bottomRightHUD = createTextSprite(['str   x29, x30, [sp]', 'mov   x29, sp', 'ldr   x0, [x19, #24]']);
+    bottomRightHUD.sprite.position.set(240, -220, 50);
+    globeGroup.add(bottomRightHUD.sprite);
+
+    // 6. Satellite Docking Depth Motion: easeOutQuint (1 - (1 - progress)^5)
     let animationFrameId;
     let lastTime = performance.now();
     const startTime = performance.now();
@@ -172,10 +186,13 @@ export const GlobeTransition = ({ onComplete }) => {
 
       if (elapsed >= DURATION) {
         globeGroup.position.z = TARGET_Z;
-        coreMat.opacity = 0.35;
-        particlesMaterial.opacity = 0.90;
-        linesMaterial.opacity = 0.25;
-        orbitMat.opacity = 0.75;
+        geoGridMaterial.opacity = 0.28;
+        accentMat.opacity = 0.35;
+        particlesMaterial.opacity = 0.95;
+        coreTorusMat.opacity = 0.85;
+        coreNodesMat.opacity = 0.95;
+        topLeftHUD.material.opacity = 0.80;
+        bottomRightHUD.material.opacity = 0.80;
         renderer.render(scene, camera);
         if (onComplete) onComplete();
         return;
@@ -186,16 +203,19 @@ export const GlobeTransition = ({ onComplete }) => {
 
       // Continuous 60 FPS Rotation
       globeGroup.rotation.y += 0.0023;
-      orbitSystem.rotation.y -= 0.0035;
+      coreTorusMesh.rotation.z += 0.0040;
 
       // Pure Depth Movement along Z-axis (-600 -> 0.0)
       globeGroup.position.z = START_Z + eased * (TARGET_Z - START_Z);
 
-      // Smooth Opacity Fade (0.0 -> 1.0)
-      coreMat.opacity = eased * 0.35;
-      particlesMaterial.opacity = eased * 0.90;
-      linesMaterial.opacity = eased * 0.25;
-      orbitMat.opacity = eased * 0.75;
+      // Smooth Opacity Fade (0.0 -> 1.0 target opacities)
+      geoGridMaterial.opacity = eased * 0.28;
+      accentMat.opacity = eased * 0.35;
+      particlesMaterial.opacity = eased * 0.95;
+      coreTorusMat.opacity = eased * 0.85;
+      coreNodesMat.opacity = eased * 0.95;
+      topLeftHUD.material.opacity = eased * 0.80;
+      bottomRightHUD.material.opacity = eased * 0.80;
 
       renderer.render(scene, camera);
       animationFrameId = requestAnimationFrame(animate);
@@ -213,14 +233,20 @@ export const GlobeTransition = ({ onComplete }) => {
       if (container && renderer.domElement) {
         container.removeChild(renderer.domElement);
       }
-      coreGeo.dispose();
-      coreMat.dispose();
+      geoGridGeometry.dispose();
+      wireframeGeo.dispose();
+      geoGridMaterial.dispose();
+      accentGeo.dispose();
+      accentWire.dispose();
+      accentMat.dispose();
       particlesGeometry.dispose();
       particlesMaterial.dispose();
-      linesGeometry.dispose();
-      linesMaterial.dispose();
-      orbitGeo.dispose();
-      orbitMat.dispose();
+      coreTorusGeo.dispose();
+      coreTorusMat.dispose();
+      coreNodesGeo.dispose();
+      coreNodesMat.dispose();
+      topLeftHUD.material.dispose();
+      bottomRightHUD.material.dispose();
       renderer.dispose();
     };
   }, [onComplete]);
