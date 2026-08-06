@@ -15,10 +15,10 @@ export const GlobeTransition = ({ onComplete }) => {
     const width = container.clientWidth || window.innerWidth;
     const height = container.clientHeight || window.innerHeight;
 
-    // 1. Three.js Scene & Perspective Camera Setup (Focal Plane)
+    // 1. Three.js Scene Setup with Static Perspective Camera (No camera movement/zoom)
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(55, width / height, 1, 2000);
-    camera.position.z = 1000;
+    camera.position.z = 1000; // Static camera position
 
     const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
     renderer.setSize(width, height);
@@ -29,11 +29,13 @@ export const GlobeTransition = ({ onComplete }) => {
     const globeGroup = new THREE.Group();
     scene.add(globeGroup);
 
-    // CONSTANT SCALE = 1.0 (NO scale animation per specification)
+    // FIXED CONSTANTS: Scale = 1.0, X = 0, Y = 0 (No scale animation, no layout shifts)
     globeGroup.scale.set(1.0, 1.0, 1.0);
+    globeGroup.position.x = 0;
+    globeGroup.position.y = 0;
 
-    // INITIAL POSITION Z: Deep behind camera plane (-25 units -> converts to -500 THREE units relative to camera)
-    const START_Z = -500;
+    // STARTING DEPTH POSITION (Z = -600 deep background space, target Z = 0)
+    const START_Z = -600;
     const TARGET_Z = 0;
     globeGroup.position.z = START_Z;
 
@@ -42,7 +44,7 @@ export const GlobeTransition = ({ onComplete }) => {
     const COLOR_SECONDARY_ACCENT = new THREE.Color('#8A9992'); // Morning Blue
     const COLOR_SURFACE = new THREE.Color('#4D2308'); // Arsenic
 
-    // 3. Glowing 3D Wireframe Sphere (Identical Mesh Structure to Landing Page)
+    // 3. Glowing Wireframe Sphere (1,200 Particles)
     const particleCount = window.innerWidth < 768 ? 400 : 1200;
     const radius = 320;
     const positions = new Float32Array(particleCount * 3);
@@ -84,7 +86,7 @@ export const GlobeTransition = ({ onComplete }) => {
     const particleSystem = new THREE.Points(particlesGeometry, particlesMaterial);
     globeGroup.add(particleSystem);
 
-    // 4. Connecting Neural Mesh Lines
+    // 4. Connecting Neural Line Segments
     const linePositions = [];
     const maxDistance = 75;
 
@@ -141,7 +143,7 @@ export const GlobeTransition = ({ onComplete }) => {
     const orbitSystem = new THREE.Points(orbitGeo, orbitMat);
     globeGroup.add(orbitSystem);
 
-    // 6. Delta-Time rAF Loop with easeOutQuint (1 - (1 - progress)^5) Pure Z-Axis Translation
+    // 6. Satellite Docking Depth Motion: easeOutQuint (1 - (1 - progress)^5)
     let animationFrameId;
     let lastTime = performance.now();
     const startTime = performance.now();
@@ -172,10 +174,10 @@ export const GlobeTransition = ({ onComplete }) => {
       globeGroup.rotation.y += 0.0023;
       orbitSystem.rotation.y -= 0.0035;
 
-      // Pure Z-Axis Translation (-500 -> 0.0)
+      // Pure Depth Movement along Z-axis (-600 -> 0.0)
       globeGroup.position.z = START_Z + eased * (TARGET_Z - START_Z);
 
-      // Smooth Opacity Fade (0.0 -> 1.0 target)
+      // Smooth Opacity Fade (0.0 -> 1.0)
       particlesMaterial.opacity = eased * 0.85;
       linesMaterial.opacity = eased * 0.22;
       orbitMat.opacity = eased * 0.70;
