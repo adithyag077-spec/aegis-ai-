@@ -26,13 +26,25 @@ export const Aegis3DGlobe = ({ visible = true }) => {
     const globeGroup = new THREE.Group();
     scene.add(globeGroup);
 
-    // 2. Color Palette Tokens
-    const COLOR_PRIMARY_ACCENT = new THREE.Color('#55443A'); // Liver Chestnut
-    const COLOR_SECONDARY_ACCENT = new THREE.Color('#8A9992'); // Morning Blue
-    const COLOR_SURFACE = new THREE.Color('#4D2308'); // Arsenic
+    // 2. Glowing White/Cyan Holographic Color Palette Tokens
+    const COLOR_WHITE = new THREE.Color('#FFFFFF');
+    const COLOR_ALMOND_LIGHT = new THREE.Color('#CFD0CD');
+    const COLOR_MORNING_BLUE = new THREE.Color('#8A9992');
+    const COLOR_CORE_GLOW = new THREE.Color('#55443A');
 
-    // 3. Neural Node Sphere (1,200 Particles)
-    const particleCount = window.innerWidth < 768 ? 400 : 1200;
+    // 3. Inner Volumetric Glowing Core Sphere (Soft Additive Core Bloom)
+    const coreGeo = new THREE.SphereGeometry(180, 32, 32);
+    const coreMat = new THREE.MeshBasicMaterial({
+      color: COLOR_CORE_GLOW,
+      transparent: true,
+      opacity: 0.35,
+      blending: THREE.AdditiveBlending
+    });
+    const coreMesh = new THREE.Mesh(coreGeo, coreMat);
+    globeGroup.add(coreMesh);
+
+    // 4. Dense Spherical Particle Cloud (3,000 Neural Nodes)
+    const particleCount = window.innerWidth < 768 ? 1000 : 3000;
     const radius = 320;
     const positions = new Float32Array(particleCount * 3);
     const colors = new Float32Array(particleCount * 3);
@@ -52,7 +64,8 @@ export const Aegis3DGlobe = ({ visible = true }) => {
 
       nodeCoords.push({ x, y, z });
 
-      const c = Math.random() > 0.4 ? COLOR_PRIMARY_ACCENT : (Math.random() > 0.5 ? COLOR_SECONDARY_ACCENT : COLOR_SURFACE);
+      const randVal = Math.random();
+      const c = randVal > 0.6 ? COLOR_WHITE : (randVal > 0.3 ? COLOR_ALMOND_LIGHT : COLOR_MORNING_BLUE);
       colors[i * 3] = c.r;
       colors[i * 3 + 1] = c.g;
       colors[i * 3 + 2] = c.b;
@@ -63,22 +76,22 @@ export const Aegis3DGlobe = ({ visible = true }) => {
     particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
     const particlesMaterial = new THREE.PointsMaterial({
-      size: 3.5,
+      size: 3.2,
       vertexColors: true,
       transparent: true,
-      opacity: 0.85,
+      opacity: 0.90,
       blending: THREE.AdditiveBlending
     });
 
     const particleSystem = new THREE.Points(particlesGeometry, particlesMaterial);
     globeGroup.add(particleSystem);
 
-    // 4. Connecting Neural Line Segments
+    // 5. Connecting Neural Line Segments
     const linePositions = [];
-    const maxDistance = 75;
+    const maxDistance = 65;
 
-    for (let i = 0; i < particleCount; i++) {
-      for (let j = i + 1; j < particleCount; j++) {
+    for (let i = 0; i < particleCount; i += 2) {
+      for (let j = i + 1; j < particleCount; j += 2) {
         const dx = nodeCoords[i].x - nodeCoords[j].x;
         const dy = nodeCoords[i].y - nodeCoords[j].y;
         const dz = nodeCoords[i].z - nodeCoords[j].z;
@@ -95,42 +108,24 @@ export const Aegis3DGlobe = ({ visible = true }) => {
     linesGeometry.setAttribute('position', new THREE.Float32BufferAttribute(linePositions, 3));
 
     const linesMaterial = new THREE.LineBasicMaterial({
-      color: COLOR_SECONDARY_ACCENT,
+      color: COLOR_MORNING_BLUE,
       transparent: true,
-      opacity: 0.22,
+      opacity: 0.25,
       blending: THREE.AdditiveBlending
     });
 
     const linesMesh = new THREE.LineSegments(linesGeometry, linesMaterial);
     globeGroup.add(linesMesh);
 
-    // 5. Latitude & Longitude Wireframe Rings
-    const ringMaterial = new THREE.LineBasicMaterial({
-      color: COLOR_SECONDARY_ACCENT,
-      transparent: true,
-      opacity: 0.12
-    });
-
-    for (let i = -2; i <= 2; i++) {
-      const ringRadius = Math.sqrt(radius * radius - (i * 60) * (i * 60));
-      if (ringRadius > 0) {
-        const ringGeo = new THREE.RingGeometry(ringRadius - 0.5, ringRadius + 0.5, 64);
-        const ringMesh = new THREE.LineLoop(ringGeo, ringMaterial);
-        ringMesh.position.z = i * 60;
-        ringMesh.rotation.x = Math.PI / 2;
-        globeGroup.add(ringMesh);
-      }
-    }
-
     // 6. Outer Orbiting Threat Beacons
-    const orbitCount = 80;
+    const orbitCount = 120;
     const orbitRadius = 390;
     const orbitPositions = new Float32Array(orbitCount * 3);
 
     for (let i = 0; i < orbitCount; i++) {
       const angle = (i / orbitCount) * Math.PI * 2;
       orbitPositions[i * 3] = Math.cos(angle) * orbitRadius;
-      orbitPositions[i * 3 + 1] = (Math.random() - 0.5) * 80;
+      orbitPositions[i * 3 + 1] = (Math.random() - 0.5) * 90;
       orbitPositions[i * 3 + 2] = Math.sin(angle) * orbitRadius;
     }
 
@@ -138,10 +133,10 @@ export const Aegis3DGlobe = ({ visible = true }) => {
     orbitGeo.setAttribute('position', new THREE.BufferAttribute(orbitPositions, 3));
 
     const orbitMat = new THREE.PointsMaterial({
-      size: 5,
-      color: COLOR_SECONDARY_ACCENT,
+      size: 4.5,
+      color: COLOR_ALMOND_LIGHT,
       transparent: true,
-      opacity: 0.7,
+      opacity: 0.75,
       blending: THREE.AdditiveBlending
     });
 
@@ -181,7 +176,7 @@ export const Aegis3DGlobe = ({ visible = true }) => {
 
     window.addEventListener('resize', handleResize);
 
-    // 8. 60 FPS Render Loop with Continuous 45s Rotation
+    // 8. 60 FPS Render Loop with Continuous Rotation
     let animationFrameId;
     let isTabActive = true;
 
@@ -217,11 +212,12 @@ export const Aegis3DGlobe = ({ visible = true }) => {
         container.removeChild(renderer.domElement);
       }
 
+      coreGeo.dispose();
+      coreMat.dispose();
       particlesGeometry.dispose();
       particlesMaterial.dispose();
       linesGeometry.dispose();
       linesMaterial.dispose();
-      ringMaterial.dispose();
       orbitGeo.dispose();
       orbitMat.dispose();
       renderer.dispose();

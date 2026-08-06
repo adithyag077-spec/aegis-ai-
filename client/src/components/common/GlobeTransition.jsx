@@ -39,13 +39,25 @@ export const GlobeTransition = ({ onComplete }) => {
     const TARGET_Z = 0;
     globeGroup.position.z = START_Z;
 
-    // 2. Color Palette Tokens
-    const COLOR_PRIMARY_ACCENT = new THREE.Color('#55443A'); // Liver Chestnut
-    const COLOR_SECONDARY_ACCENT = new THREE.Color('#8A9992'); // Morning Blue
-    const COLOR_SURFACE = new THREE.Color('#4D2308'); // Arsenic
+    // 2. Glowing White/Cyan Holographic Color Palette Tokens
+    const COLOR_WHITE = new THREE.Color('#FFFFFF');
+    const COLOR_ALMOND_LIGHT = new THREE.Color('#CFD0CD');
+    const COLOR_MORNING_BLUE = new THREE.Color('#8A9992');
+    const COLOR_CORE_GLOW = new THREE.Color('#55443A');
 
-    // 3. Glowing Wireframe Sphere (1,200 Particles)
-    const particleCount = window.innerWidth < 768 ? 400 : 1200;
+    // 3. Inner Volumetric Glowing Core Sphere (Soft Additive Core Bloom)
+    const coreGeo = new THREE.SphereGeometry(180, 32, 32);
+    const coreMat = new THREE.MeshBasicMaterial({
+      color: COLOR_CORE_GLOW,
+      transparent: true,
+      opacity: 0.0, // Fades 0.0 -> 0.35
+      blending: THREE.AdditiveBlending
+    });
+    const coreMesh = new THREE.Mesh(coreGeo, coreMat);
+    globeGroup.add(coreMesh);
+
+    // 4. Dense Spherical Particle Cloud (3,000 Neural Nodes)
+    const particleCount = window.innerWidth < 768 ? 1000 : 3000;
     const radius = 320;
     const positions = new Float32Array(particleCount * 3);
     const colors = new Float32Array(particleCount * 3);
@@ -65,7 +77,8 @@ export const GlobeTransition = ({ onComplete }) => {
 
       nodeCoords.push({ x, y, z });
 
-      const c = Math.random() > 0.4 ? COLOR_PRIMARY_ACCENT : (Math.random() > 0.5 ? COLOR_SECONDARY_ACCENT : COLOR_SURFACE);
+      const randVal = Math.random();
+      const c = randVal > 0.6 ? COLOR_WHITE : (randVal > 0.3 ? COLOR_ALMOND_LIGHT : COLOR_MORNING_BLUE);
       colors[i * 3] = c.r;
       colors[i * 3 + 1] = c.g;
       colors[i * 3 + 2] = c.b;
@@ -76,22 +89,22 @@ export const GlobeTransition = ({ onComplete }) => {
     particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
     const particlesMaterial = new THREE.PointsMaterial({
-      size: 3.5,
+      size: 3.2,
       vertexColors: true,
       transparent: true,
-      opacity: 0.0, // Fades 0.0 -> 0.85
+      opacity: 0.0, // Fades 0.0 -> 0.90
       blending: THREE.AdditiveBlending
     });
 
     const particleSystem = new THREE.Points(particlesGeometry, particlesMaterial);
     globeGroup.add(particleSystem);
 
-    // 4. Connecting Neural Line Segments
+    // 5. Connecting Neural Line Segments
     const linePositions = [];
-    const maxDistance = 75;
+    const maxDistance = 65;
 
-    for (let i = 0; i < particleCount; i++) {
-      for (let j = i + 1; j < particleCount; j++) {
+    for (let i = 0; i < particleCount; i += 2) {
+      for (let j = i + 1; j < particleCount; j += 2) {
         const dx = nodeCoords[i].x - nodeCoords[j].x;
         const dy = nodeCoords[i].y - nodeCoords[j].y;
         const dz = nodeCoords[i].z - nodeCoords[j].z;
@@ -108,24 +121,24 @@ export const GlobeTransition = ({ onComplete }) => {
     linesGeometry.setAttribute('position', new THREE.Float32BufferAttribute(linePositions, 3));
 
     const linesMaterial = new THREE.LineBasicMaterial({
-      color: COLOR_SECONDARY_ACCENT,
+      color: COLOR_MORNING_BLUE,
       transparent: true,
-      opacity: 0.0, // Fades 0.0 -> 0.22
+      opacity: 0.0, // Fades 0.0 -> 0.25
       blending: THREE.AdditiveBlending
     });
 
     const linesMesh = new THREE.LineSegments(linesGeometry, linesMaterial);
     globeGroup.add(linesMesh);
 
-    // 5. Outer Orbiting Threat Beacons
-    const orbitCount = 80;
+    // 6. Outer Orbiting Threat Beacons
+    const orbitCount = 120;
     const orbitRadius = 390;
     const orbitPositions = new Float32Array(orbitCount * 3);
 
     for (let i = 0; i < orbitCount; i++) {
       const angle = (i / orbitCount) * Math.PI * 2;
       orbitPositions[i * 3] = Math.cos(angle) * orbitRadius;
-      orbitPositions[i * 3 + 1] = (Math.random() - 0.5) * 80;
+      orbitPositions[i * 3 + 1] = (Math.random() - 0.5) * 90;
       orbitPositions[i * 3 + 2] = Math.sin(angle) * orbitRadius;
     }
 
@@ -133,17 +146,17 @@ export const GlobeTransition = ({ onComplete }) => {
     orbitGeo.setAttribute('position', new THREE.BufferAttribute(orbitPositions, 3));
 
     const orbitMat = new THREE.PointsMaterial({
-      size: 5,
-      color: COLOR_SECONDARY_ACCENT,
+      size: 4.5,
+      color: COLOR_ALMOND_LIGHT,
       transparent: true,
-      opacity: 0.0, // Fades 0.0 -> 0.70
+      opacity: 0.0, // Fades 0.0 -> 0.75
       blending: THREE.AdditiveBlending
     });
 
     const orbitSystem = new THREE.Points(orbitGeo, orbitMat);
     globeGroup.add(orbitSystem);
 
-    // 6. Satellite Docking Depth Motion: easeOutQuint (1 - (1 - progress)^5)
+    // 7. Satellite Docking Depth Motion: easeOutQuint (1 - (1 - progress)^5)
     let animationFrameId;
     let lastTime = performance.now();
     const startTime = performance.now();
@@ -159,9 +172,10 @@ export const GlobeTransition = ({ onComplete }) => {
 
       if (elapsed >= DURATION) {
         globeGroup.position.z = TARGET_Z;
-        particlesMaterial.opacity = 0.85;
-        linesMaterial.opacity = 0.22;
-        orbitMat.opacity = 0.70;
+        coreMat.opacity = 0.35;
+        particlesMaterial.opacity = 0.90;
+        linesMaterial.opacity = 0.25;
+        orbitMat.opacity = 0.75;
         renderer.render(scene, camera);
         if (onComplete) onComplete();
         return;
@@ -178,9 +192,10 @@ export const GlobeTransition = ({ onComplete }) => {
       globeGroup.position.z = START_Z + eased * (TARGET_Z - START_Z);
 
       // Smooth Opacity Fade (0.0 -> 1.0)
-      particlesMaterial.opacity = eased * 0.85;
-      linesMaterial.opacity = eased * 0.22;
-      orbitMat.opacity = eased * 0.70;
+      coreMat.opacity = eased * 0.35;
+      particlesMaterial.opacity = eased * 0.90;
+      linesMaterial.opacity = eased * 0.25;
+      orbitMat.opacity = eased * 0.75;
 
       renderer.render(scene, camera);
       animationFrameId = requestAnimationFrame(animate);
@@ -198,6 +213,8 @@ export const GlobeTransition = ({ onComplete }) => {
       if (container && renderer.domElement) {
         container.removeChild(renderer.domElement);
       }
+      coreGeo.dispose();
+      coreMat.dispose();
       particlesGeometry.dispose();
       particlesMaterial.dispose();
       linesGeometry.dispose();
