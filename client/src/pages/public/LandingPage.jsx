@@ -33,44 +33,42 @@ export const LandingPage = ({ isGlobeVisible = true, isHeroRevealed = true }) =>
     }, 700);
   };
 
-  // Header Nav Drop & Fade Variant (Order #1 & #7)
+  // Header Nav Fade & Soft Drop Variant (Order #1)
   const navVariants = {
-    hidden: { opacity: 0, y: -24, filter: 'blur(8px)' },
+    hidden: { opacity: 0, y: -16, filter: 'blur(8px)' },
     visible: {
       opacity: 1,
       y: 0,
       filter: 'blur(0px)',
-      transition: { duration: 0.6, delay: 0.0, ease: [0.22, 1, 0.36, 1] }
+      transition: { duration: 0.5, delay: 0.0, ease: [0.22, 1, 0.36, 1] }
     }
   };
 
-  // Apple / OpenAI Style Staggered Blur Reveal Animation Container (100ms Stagger)
+  // Apple / OpenAI Style Staggered Upward Rise Reveal Container (90ms Stagger)
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: { 
-        staggerChildren: 0.10, 
-        delayChildren: 0.10 
+        staggerChildren: 0.09, 
+        delayChildren: 0.08 
       }
     }
   };
 
-  // Individual Hero Element Drop & Fade Variant (Badge -> Title -> Description -> Buttons -> Jarvis Matrix Card)
+  // Apple / OpenAI Soft Upward Rise Variant (y: 18px -> 0px, blur: 8px -> 0px, opacity: 0 -> 1)
   const itemVariants = {
     hidden: { 
       opacity: 0, 
-      y: -24, 
-      scale: 0.98,
-      filter: 'blur(10px)'
+      y: 18, 
+      filter: 'blur(8px)'
     },
     visible: { 
       opacity: 1, 
       y: 0, 
-      scale: 1,
       filter: 'blur(0px)',
       transition: { 
-        duration: 0.60, 
+        duration: 0.55, 
         ease: [0.22, 1, 0.36, 1] 
       } 
     }
@@ -84,7 +82,7 @@ export const LandingPage = ({ isGlobeVisible = true, isHeroRevealed = true }) =>
       {/* 3D Warp Shutter Overlay */}
       <WarpOverlay show={isWarping} />
 
-      {/* 1. Navigation Bar (Enters smoothly after Globe Settles) */}
+      {/* 1. Navigation Bar (Enters smoothly as Globe Settles) */}
       <motion.header 
         initial="hidden"
         animate={isHeroRevealed ? "visible" : "hidden"}
@@ -114,7 +112,7 @@ export const LandingPage = ({ isGlobeVisible = true, isHeroRevealed = true }) =>
         </div>
       </motion.header>
 
-      {/* Hero Section with Staggered 100ms Reveal Sequence */}
+      {/* Hero Section with Apple / OpenAI 90ms Soft Upward Rise Sequence */}
       <motion.main 
         variants={containerVariants}
         initial="hidden"
