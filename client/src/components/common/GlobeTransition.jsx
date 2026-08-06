@@ -30,9 +30,9 @@ export const GlobeTransition = ({ onComplete }) => {
     const globeGroup = new THREE.Group();
     scene.add(globeGroup);
 
-    // Initial position deep in Z-axis space (-1200px) and tiny scale (0.10)
-    globeGroup.position.z = -1200;
-    globeGroup.scale.set(0.1, 0.1, 0.1);
+    // Initial position behind page in Z-axis (-800px) and start scale (0.15)
+    globeGroup.position.z = -800;
+    globeGroup.scale.set(0.15, 0.15, 0.15);
 
     // 2. Color Palette Tokens
     const COLOR_PRIMARY_ACCENT = new THREE.Color('#55443A'); // Liver Chestnut
@@ -41,7 +41,7 @@ export const GlobeTransition = ({ onComplete }) => {
 
     // 3. Glowing Wireframe Sphere (1,200 Particles)
     const particleCount = window.innerWidth < 768 ? 500 : 1200;
-    const radius = 330;
+    const radius = 320;
     const positions = new Float32Array(particleCount * 3);
     const colors = new Float32Array(particleCount * 3);
     const nodeCoords = [];
@@ -71,10 +71,10 @@ export const GlobeTransition = ({ onComplete }) => {
     particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
     const particlesMaterial = new THREE.PointsMaterial({
-      size: 4.5,
+      size: 3.5,
       vertexColors: true,
       transparent: true,
-      opacity: 0.1, // Brightens from 0.1 -> 0.9 as it approaches
+      opacity: 0.1,
       blending: THREE.AdditiveBlending
     });
 
@@ -83,7 +83,7 @@ export const GlobeTransition = ({ onComplete }) => {
 
     // 4. Connecting Neural Line Segments
     const linePositions = [];
-    const maxDistance = 78;
+    const maxDistance = 75;
 
     for (let i = 0; i < particleCount; i++) {
       for (let j = i + 1; j < particleCount; j++) {
@@ -138,12 +138,12 @@ export const GlobeTransition = ({ onComplete }) => {
     const orbitSystem = new THREE.Points(orbitGeo, orbitMat);
     globeGroup.add(orbitSystem);
 
-    // 6. 60 FPS Render Loop: Deep Z-Axis Fly-In Motion Trajectory (2.0s Duration)
+    // 6. Monotonic Spacecraft Docking Trajectory: easeOutCubic (1 - (1 - progress)^3)
     let animationFrameId;
     const startTime = performance.now();
-    const DURATION = 2000; // 2.0 seconds
+    const DURATION = 2000; // 2.0s
 
-    const easeInOutCubic = (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
 
     const animate = (currentTime) => {
       const elapsed = currentTime - startTime;
@@ -154,30 +154,22 @@ export const GlobeTransition = ({ onComplete }) => {
       }
 
       const progress = Math.min(elapsed / DURATION, 1.0);
-      const eased = easeInOutCubic(progress);
+      const eased = easeOutCubic(progress);
 
       // Continuous 60 FPS Rotation
-      globeGroup.rotation.y += 0.008;
-      orbitSystem.rotation.y -= 0.011;
+      globeGroup.rotation.y += 0.006;
+      orbitSystem.rotation.y -= 0.009;
 
-      // Deep Z-Axis Fly-In Trajectory (-1200 -> 0)
-      const flyInZ = -1200 + eased * 1200;
-      globeGroup.position.z = flyInZ;
+      // Monotonic Z-axis fly-in (-800 -> 0.0)
+      globeGroup.position.z = -800 + eased * 800;
 
-      // Brighten materials as globe flies closer
-      particlesMaterial.opacity = 0.1 + eased * 0.8;
-      linesMaterial.opacity = 0.05 + eased * 0.25;
+      // Monotonic scale lerp (0.15 -> 0.45 target hero scale)
+      const scaleVal = 0.15 + eased * 0.30;
+      globeGroup.scale.set(scaleVal, scaleVal, scaleVal);
 
-      // Scale lerp (0.1 -> 1.0 -> gently settles into 0.45 hero size over final 0.5s)
-      if (progress < 0.7) {
-        const p = progress / 0.7;
-        const s = 0.1 + easeInOutCubic(p) * 0.9;
-        globeGroup.scale.set(s, s, s);
-      } else {
-        const p = (progress - 0.7) / 0.3;
-        const s = 1.0 - easeInOutCubic(p) * 0.55;
-        globeGroup.scale.set(s, s, s);
-      }
+      // Material opacities brighten smoothly as globe docks
+      particlesMaterial.opacity = 0.1 + eased * 0.75;
+      linesMaterial.opacity = 0.05 + eased * 0.17;
 
       renderer.render(scene, camera);
       animationFrameId = requestAnimationFrame(animate);
