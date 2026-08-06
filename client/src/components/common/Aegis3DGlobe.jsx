@@ -26,6 +26,9 @@ export const Aegis3DGlobe = () => {
     const globeGroup = new THREE.Group();
     scene.add(globeGroup);
 
+    // Initial scale for assembly animation (expands from 0.4 -> 1.0)
+    globeGroup.scale.set(0.4, 0.4, 0.4);
+
     // 2. New Color Palette Tokens
     const COLOR_PRIMARY_ACCENT = new THREE.Color('#55443A'); // Liver Chestnut
     const COLOR_SECONDARY_ACCENT = new THREE.Color('#8A9992'); // Morning Blue
@@ -52,7 +55,6 @@ export const Aegis3DGlobe = () => {
 
       nodeCoords.push({ x, y, z });
 
-      // Color variation across nodes
       const c = Math.random() > 0.4 ? COLOR_PRIMARY_ACCENT : (Math.random() > 0.5 ? COLOR_SECONDARY_ACCENT : COLOR_SURFACE);
       colors[i * 3] = c.r;
       colors[i * 3 + 1] = c.g;
@@ -128,7 +130,7 @@ export const Aegis3DGlobe = () => {
       }
     }
 
-    // 6. Outer Orbiting Threat Beacons
+    // 6. Outer Orbiting Threat Beacons & Traveling Light Pulses
     const orbitCount = 80;
     const orbitRadius = 390;
     const orbitPositions = new Float32Array(orbitCount * 3);
@@ -187,9 +189,10 @@ export const Aegis3DGlobe = () => {
 
     window.addEventListener('resize', handleResize);
 
-    // 8. 60 FPS Render Loop with Continuous 45s Rotation
+    // 8. 60 FPS Render Loop with Continuous 45s Rotation & Initial Scale Expansion
     let animationFrameId;
     let isTabActive = true;
+    let scaleProgress = 0.4;
 
     const handleVisibilityChange = () => {
       isTabActive = !document.hidden;
@@ -198,6 +201,12 @@ export const Aegis3DGlobe = () => {
 
     const animate = () => {
       if (isTabActive) {
+        // Assembly scale expansion lerp (0.4 -> 1.0)
+        if (scaleProgress < 1.0) {
+          scaleProgress += (1.0 - scaleProgress) * 0.05;
+          globeGroup.scale.set(scaleProgress, scaleProgress, scaleProgress);
+        }
+
         // Continuous auto-rotation (~1 revolution per 45s = 0.0023 rad/frame)
         globeGroup.rotation.y += 0.0023;
         orbitSystem.rotation.y -= 0.0035;
@@ -239,7 +248,7 @@ export const Aegis3DGlobe = () => {
   return (
     <div
       ref={mountRef}
-      className="absolute inset-0 pointer-events-none z-0 overflow-hidden opacity-60 flex items-center justify-center"
+      className="absolute inset-0 pointer-events-none z-0 overflow-hidden opacity-60 flex items-center justify-center transition-opacity duration-1000"
     />
   );
 };

@@ -33,20 +33,35 @@ export const LandingPage = () => {
     }, 700);
   };
 
+  // Apple / OpenAI Style Staggered Blur Reveal Animation Container
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: { staggerChildren: 0.1, delayChildren: 0.1 }
+      transition: { 
+        staggerChildren: 0.12, 
+        delayChildren: 0.15 
+      }
     }
   };
 
+  // Apple / OpenAI Style Individual Item Blur Reveal Variant
   const itemVariants = {
-    hidden: { opacity: 0, y: 24 },
+    hidden: { 
+      opacity: 0, 
+      y: 24, 
+      scale: 0.98,
+      filter: 'blur(10px)'
+    },
     visible: { 
       opacity: 1, 
       y: 0, 
-      transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } 
+      scale: 1,
+      filter: 'blur(0px)',
+      transition: { 
+        duration: 0.65, 
+        ease: [0.22, 1, 0.36, 1] 
+      } 
     }
   };
 
@@ -60,9 +75,9 @@ export const LandingPage = () => {
 
       {/* Header Navigation */}
       <motion.header 
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
+        initial={{ opacity: 0, y: -12, filter: 'blur(6px)' }}
+        animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
         className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full py-6 flex items-center justify-between relative z-10"
       >
         <div className="flex items-center gap-3">
@@ -88,7 +103,7 @@ export const LandingPage = () => {
         </div>
       </motion.header>
 
-      {/* Hero Section */}
+      {/* Hero Section with Cinematic Staggered Blur Reveal */}
       <motion.main 
         variants={containerVariants}
         initial="hidden"
@@ -96,19 +111,23 @@ export const LandingPage = () => {
         className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full py-16 flex flex-col md:flex-row items-center justify-between gap-12 relative z-10"
       >
         <div className="space-y-6 max-w-2xl">
+          {/* 1. Autonomous AI Cyber Shield Badge */}
           <motion.div variants={itemVariants} className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full neu-inset text-[#CFD0CD] border border-[rgba(138,153,146,0.25)] text-xs font-mono font-bold bg-[#4D2308]">
             <Sparkles className="w-3.5 h-3.5 text-[#8A9992]" />
             <span>AUTONOMOUS AI CYBER SHIELD • POWERED BY GOOGLE GEMINI</span>
           </motion.div>
 
+          {/* 2. Main Hero Heading */}
           <motion.h1 variants={itemVariants} className="text-4xl sm:text-6xl font-extrabold tracking-tight leading-tight font-heading">
             Enterprise AI <span className="gradient-text-hero">Threat Detection</span> & Identity Defense
           </motion.h1>
 
+          {/* 3. Description Text */}
           <motion.p variants={itemVariants} className="text-sm sm:text-base text-[#B8BBB7] leading-relaxed font-sans max-w-xl">
             Next-generation Security Operations Center fusing real-time multi-vector threat scanning, MITRE ATT&CK kill-chain mapping, and autonomous AI remediation playbooks.
           </motion.p>
 
+          {/* 4. Action Buttons */}
           <motion.div variants={itemVariants} className="flex items-center gap-4 pt-4 font-mono text-xs">
             <Link
               to="/app/dashboard"
@@ -128,7 +147,7 @@ export const LandingPage = () => {
           </motion.div>
         </div>
 
-        {/* Wireframe Node Graphic Visualizer */}
+        {/* 5. JARVIS Matrix Information Card */}
         <motion.div 
           variants={itemVariants}
           className={`relative w-full max-w-md h-80 neu-raised p-6 rounded-[28px] flex items-center justify-center overflow-hidden border border-[rgba(138,153,146,0.25)] transition-transform duration-500 bg-[#55443A] ${
