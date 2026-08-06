@@ -33,39 +33,42 @@ export const LandingPage = ({ isGlobeVisible = true, isHeroRevealed = true }) =>
     }, 700);
   };
 
-  // Header Nav Fade & Soft Drop Variant (Order #1)
+  // 1. Navigation Bar Gentle Fall Variant (y: -25px -> 0, scale: 0.98 -> 1, blur: 6px -> 0px)
   const navVariants = {
-    hidden: { opacity: 0, y: -16, filter: 'blur(8px)' },
+    hidden: { opacity: 0, y: -25, scale: 0.98, filter: 'blur(6px)' },
     visible: {
       opacity: 1,
       y: 0,
+      scale: 1,
       filter: 'blur(0px)',
-      transition: { duration: 0.5, delay: 0.0, ease: [0.22, 1, 0.36, 1] }
+      transition: { duration: 0.55, delay: 0.0, ease: [0.22, 1, 0.36, 1] }
     }
   };
 
-  // Apple / OpenAI Style Staggered Upward Rise Reveal Container (90ms Stagger)
+  // 60ms Overlapping Stagger Container
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: { 
-        staggerChildren: 0.09, 
-        delayChildren: 0.08 
+        staggerChildren: 0.06, 
+        delayChildren: 0.06 
       }
     }
   };
 
-  // Apple / OpenAI Soft Upward Rise Variant (y: 18px -> 0px, blur: 8px -> 0px, opacity: 0 -> 1)
+  // Individual Component Gentle Fall Variant (y: -25px -> 0, scale: 0.98 -> 1, blur: 6px -> 0px)
   const itemVariants = {
     hidden: { 
       opacity: 0, 
-      y: 18, 
-      filter: 'blur(8px)'
+      y: -25, 
+      scale: 0.98,
+      filter: 'blur(6px)'
     },
     visible: { 
       opacity: 1, 
       y: 0, 
+      scale: 1,
       filter: 'blur(0px)',
       transition: { 
         duration: 0.55, 
@@ -82,7 +85,7 @@ export const LandingPage = ({ isGlobeVisible = true, isHeroRevealed = true }) =>
       {/* 3D Warp Shutter Overlay */}
       <WarpOverlay show={isWarping} />
 
-      {/* 1. Navigation Bar (Enters smoothly as Globe Settles) */}
+      {/* 1. Navigation Bar */}
       <motion.header 
         initial="hidden"
         animate={isHeroRevealed ? "visible" : "hidden"}
@@ -112,7 +115,7 @@ export const LandingPage = ({ isGlobeVisible = true, isHeroRevealed = true }) =>
         </div>
       </motion.header>
 
-      {/* Hero Section with Apple / OpenAI 90ms Soft Upward Rise Sequence */}
+      {/* Hero Section with 60ms Overlapping Synchronized Reveal Sequence */}
       <motion.main 
         variants={containerVariants}
         initial="hidden"
@@ -136,7 +139,7 @@ export const LandingPage = ({ isGlobeVisible = true, isHeroRevealed = true }) =>
             Next-generation Security Operations Center fusing real-time multi-vector threat scanning, MITRE ATT&CK kill-chain mapping, and autonomous AI remediation playbooks.
           </motion.p>
 
-          {/* 5. Primary Action Buttons */}
+          {/* 5. Primary & Secondary Action Buttons */}
           <motion.div variants={itemVariants} className="flex items-center gap-4 pt-4 font-mono text-xs">
             <Link
               to="/app/dashboard"
