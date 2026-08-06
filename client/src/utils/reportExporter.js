@@ -5,6 +5,11 @@ export const exportSecurityReport = (resultData, moduleName = 'Cyber Defense Ins
   const timestamp = new Date().toLocaleString();
   const reportId = `AEGIS-RPT-${Math.floor(100000 + Math.random() * 900000)}`;
 
+  const indicators = Array.isArray(resultData?.indicators) ? resultData.indicators : [];
+  const safeActions = Array.isArray(resultData?.safeActions)
+    ? resultData.safeActions
+    : (Array.isArray(resultData?.recommendations) ? resultData.recommendations : []);
+
   const htmlContent = `
 <!DOCTYPE html>
 <html>
@@ -30,7 +35,7 @@ export const exportSecurityReport = (resultData, moduleName = 'Cyber Defense Ins
     <div class="header">
       <div>
         <div class="logo">AegisAI Security Engine</div>
-        <div style="font-size: 12px; color: #94A3B8;">Official Executive Cyber Threat Report</div>
+        <div style="font-size: 12px; color: #94A3B8;">Official Executive Cyber Threat Report • ${moduleName}</div>
       </div>
       <div style="text-align: right;">
         <div class="badge">${resultData?.threatLevel || 'SAFE'} RISK</div>
@@ -60,23 +65,23 @@ export const exportSecurityReport = (resultData, moduleName = 'Cyber Defense Ins
       </div>
     </div>
 
-    ${resultData?.indicators?.length ? `
+    ${indicators.length > 0 ? `
     <div class="section">
       <div class="section-title">Detected Threat Indicators</div>
       <div class="card">
         <ul>
-          ${resultData.indicators.map(ind => `<li>⚠️ ${ind}</li>`).join('')}
+          ${indicators.map(ind => `<li>⚠️ ${typeof ind === 'string' ? ind : JSON.stringify(ind)}</li>`).join('')}
         </ul>
       </div>
     </div>
     ` : ''}
 
-    ${resultData?.safeActions?.length ? `
+    ${safeActions.length > 0 ? `
     <div class="section">
       <div class="section-title">Recommended Defense Actions</div>
       <div class="card">
         <ul>
-          ${resultData.safeActions.map(act => `<li>✅ ${act}</li>`).join('')}
+          ${safeActions.map(act => `<li>✅ ${typeof act === 'string' ? act : JSON.stringify(act)}</li>`).join('')}
         </ul>
       </div>
     </div>

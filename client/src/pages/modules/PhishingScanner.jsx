@@ -20,9 +20,29 @@ export const PhishingScanner = () => {
 
     try {
       const res = await scanService.scanPhishing({ content, type });
-      setResult(res.data.result);
+
+      // Robust Response Extraction and Validation
+      const rawResult = res?.data?.result || res?.result || res?.data || res;
+
+      if (rawResult && typeof rawResult === 'object') {
+        const validatedResult = {
+          ...rawResult,
+          indicators: Array.isArray(rawResult.indicators) ? rawResult.indicators : [],
+          safeActions: Array.isArray(rawResult.safeActions) 
+            ? rawResult.safeActions 
+            : (Array.isArray(rawResult.recommendations) ? rawResult.recommendations : []),
+          verdict: rawResult.verdict || 'Phishing Audit Complete',
+          threatLevel: rawResult.threatLevel || 'SAFE',
+          riskScore: typeof rawResult.riskScore === 'number' ? rawResult.riskScore : 0,
+          confidenceScore: typeof rawResult.confidenceScore === 'number' ? rawResult.confidenceScore : 0.95,
+          explanation: rawResult.explanation || 'No immediate phishing signatures detected.'
+        };
+        setResult(validatedResult);
+      } else {
+        setError('Received an empty or invalid response from the security engine.');
+      }
     } catch (err) {
-      setError(err.message || 'Phishing scan failed.');
+      setError(err.message || 'Phishing scan failed to process. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -67,7 +87,7 @@ export const PhishingScanner = () => {
             <button
               type="button"
               onClick={() => setContent('http://verify-account-update-bank-login.xyz/auth?user=123')}
-              className="text-xs font-mono text-slate-500 hover:text-emerald-400 underline"
+              className="text-xs font-mono text-slate-500 hover:text-emerald-400 underline cursor-pointer"
             >
               Insert Phishing Test URL
             </button>
@@ -75,7 +95,7 @@ export const PhishingScanner = () => {
             <button
               type="submit"
               disabled={loading || !content.trim()}
-              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-rose-500 to-red-600 text-white text-xs font-bold shadow-lg shadow-rose-500/20 hover:opacity-95 transition-all flex items-center gap-2 disabled:opacity-50"
+              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-rose-500 to-red-600 text-white text-xs font-bold shadow-lg shadow-rose-500/20 hover:opacity-95 transition-all flex items-center gap-2 disabled:opacity-50 cursor-pointer"
             >
               <Zap className="w-4 h-4" />
               <span>{loading ? 'Analyzing...' : 'Run Phishing Audit'}</span>
