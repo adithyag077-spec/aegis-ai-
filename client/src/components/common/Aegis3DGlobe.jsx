@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 
-export const Aegis3DGlobe = () => {
+export const Aegis3DGlobe = ({ visible = true }) => {
   const mountRef = useRef(null);
 
   useEffect(() => {
@@ -26,10 +26,7 @@ export const Aegis3DGlobe = () => {
     const globeGroup = new THREE.Group();
     scene.add(globeGroup);
 
-    // Initial scale for assembly animation (expands from 0.4 -> 1.0)
-    globeGroup.scale.set(0.4, 0.4, 0.4);
-
-    // 2. New Color Palette Tokens
+    // 2. Color Palette Tokens
     const COLOR_PRIMARY_ACCENT = new THREE.Color('#55443A'); // Liver Chestnut
     const COLOR_SECONDARY_ACCENT = new THREE.Color('#8A9992'); // Morning Blue
     const COLOR_SURFACE = new THREE.Color('#4D2308'); // Arsenic
@@ -78,7 +75,6 @@ export const Aegis3DGlobe = () => {
 
     // 4. Connecting Neural Line Segments
     const linePositions = [];
-    const lineColors = [];
     const maxDistance = 75;
 
     for (let i = 0; i < particleCount; i++) {
@@ -91,10 +87,6 @@ export const Aegis3DGlobe = () => {
         if (dist < maxDistance) {
           linePositions.push(nodeCoords[i].x, nodeCoords[i].y, nodeCoords[i].z);
           linePositions.push(nodeCoords[j].x, nodeCoords[j].y, nodeCoords[j].z);
-
-          const alpha = (1 - dist / maxDistance) * 0.25;
-          lineColors.push(COLOR_SECONDARY_ACCENT.r, COLOR_SECONDARY_ACCENT.g, COLOR_SECONDARY_ACCENT.b, alpha);
-          lineColors.push(COLOR_PRIMARY_ACCENT.r, COLOR_PRIMARY_ACCENT.g, COLOR_PRIMARY_ACCENT.b, alpha);
         }
       }
     }
@@ -130,7 +122,7 @@ export const Aegis3DGlobe = () => {
       }
     }
 
-    // 6. Outer Orbiting Threat Beacons & Traveling Light Pulses
+    // 6. Outer Orbiting Threat Beacons
     const orbitCount = 80;
     const orbitRadius = 390;
     const orbitPositions = new Float32Array(orbitCount * 3);
@@ -189,10 +181,9 @@ export const Aegis3DGlobe = () => {
 
     window.addEventListener('resize', handleResize);
 
-    // 8. 60 FPS Render Loop with Continuous 45s Rotation & Initial Scale Expansion
+    // 8. 60 FPS Render Loop with Continuous 45s Rotation
     let animationFrameId;
     let isTabActive = true;
-    let scaleProgress = 0.4;
 
     const handleVisibilityChange = () => {
       isTabActive = !document.hidden;
@@ -201,17 +192,9 @@ export const Aegis3DGlobe = () => {
 
     const animate = () => {
       if (isTabActive) {
-        // Assembly scale expansion lerp (0.4 -> 1.0)
-        if (scaleProgress < 1.0) {
-          scaleProgress += (1.0 - scaleProgress) * 0.05;
-          globeGroup.scale.set(scaleProgress, scaleProgress, scaleProgress);
-        }
-
-        // Continuous auto-rotation (~1 revolution per 45s = 0.0023 rad/frame)
         globeGroup.rotation.y += 0.0023;
         orbitSystem.rotation.y -= 0.0035;
 
-        // Smooth spring lerp toward mouse target tilt
         globeGroup.rotation.x += (targetRotationX - globeGroup.rotation.x) * 0.05;
         globeGroup.rotation.z += (targetRotationY - globeGroup.rotation.z) * 0.05;
 
@@ -248,7 +231,9 @@ export const Aegis3DGlobe = () => {
   return (
     <div
       ref={mountRef}
-      className="absolute inset-0 pointer-events-none z-0 overflow-hidden opacity-60 flex items-center justify-center transition-opacity duration-1000"
+      className={`absolute inset-0 pointer-events-none z-0 overflow-hidden flex items-center justify-center transition-opacity duration-700 ${
+        visible ? 'opacity-60' : 'opacity-0'
+      }`}
     />
   );
 };

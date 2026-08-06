@@ -5,7 +5,7 @@ import { Shield, ArrowRight, Sparkles, Terminal, Activity, Lock, Cpu } from 'luc
 import { WarpOverlay } from '../../components/common/WarpOverlay';
 import { Aegis3DGlobe } from '../../components/common/Aegis3DGlobe';
 
-export const LandingPage = () => {
+export const LandingPage = ({ isGlobeVisible = true }) => {
   const navigate = useNavigate();
   const [isWarping, setIsWarping] = useState(false);
 
@@ -67,8 +67,8 @@ export const LandingPage = () => {
 
   return (
     <div className="min-h-screen gradient-ambient text-[#CFD0CD] flex flex-col justify-between selection:bg-[#55443A]/40 selection:text-[#CFD0CD] relative overflow-hidden bg-[#0D1117]">
-      {/* Interactive 3D Dune Neural Globe Background */}
-      <Aegis3DGlobe />
+      {/* Interactive 3D Dune Neural Globe Background (Controlled by isGlobeVisible prop) */}
+      <Aegis3DGlobe visible={isGlobeVisible} />
 
       {/* 3D Warp Shutter Overlay */}
       <WarpOverlay show={isWarping} />

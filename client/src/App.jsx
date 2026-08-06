@@ -90,7 +90,7 @@ export default function App() {
         <ThreatProvider>
           <ToastProvider>
             <BrowserRouter>
-              {/* Startup Sequence: Intro -> 0ms -> GlobeTransition (2s) -> LandingPage */}
+              {/* Startup Overlays: Intro -> 0ms -> GlobeTransition (2s) -> READY */}
               {startupStep === 'INTRO' && (
                 <AegisBootIntro onComplete={() => setStartupStep('GLOBE_TRANSITION')} />
               )}
@@ -100,8 +100,8 @@ export default function App() {
 
               <Suspense fallback={<PageFallback />}>
                 <Routes>
-                  {/* Public Guest Routes */}
-                  <Route path="/" element={<LandingPage />} />
+                  {/* Public Guest Routes - Globe is hidden during startup sequence until READY */}
+                  <Route path="/" element={<LandingPage isGlobeVisible={startupStep === 'READY'} />} />
                   <Route path="/login" element={<LoginPage />} />
                   <Route path="/register" element={<RegisterPage />} />
 
