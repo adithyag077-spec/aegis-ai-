@@ -26,10 +26,10 @@ export const Aegis3DGlobe = () => {
     const globeGroup = new THREE.Group();
     scene.add(globeGroup);
 
-    // 2. Dune Palette Tokens
-    const COLOR_AMBER = new THREE.Color('#d98a3d');
-    const COLOR_BRIGHT_AMBER = new THREE.Color('#f0a355');
-    const COLOR_RUST = new THREE.Color('#b3542e');
+    // 2. New Color Palette Tokens
+    const COLOR_PRIMARY_ACCENT = new THREE.Color('#55443A'); // Liver Chestnut
+    const COLOR_SECONDARY_ACCENT = new THREE.Color('#8A9992'); // Morning Blue
+    const COLOR_SURFACE = new THREE.Color('#4D2308'); // Arsenic
 
     // 3. Neural Node Sphere (1,200 Particles)
     const particleCount = window.innerWidth < 768 ? 400 : 1200;
@@ -52,8 +52,8 @@ export const Aegis3DGlobe = () => {
 
       nodeCoords.push({ x, y, z });
 
-      // Dune color gradient variation across nodes
-      const c = Math.random() > 0.4 ? COLOR_AMBER : (Math.random() > 0.5 ? COLOR_BRIGHT_AMBER : COLOR_RUST);
+      // Color variation across nodes
+      const c = Math.random() > 0.4 ? COLOR_PRIMARY_ACCENT : (Math.random() > 0.5 ? COLOR_SECONDARY_ACCENT : COLOR_SURFACE);
       colors[i * 3] = c.r;
       colors[i * 3 + 1] = c.g;
       colors[i * 3 + 2] = c.b;
@@ -91,8 +91,8 @@ export const Aegis3DGlobe = () => {
           linePositions.push(nodeCoords[j].x, nodeCoords[j].y, nodeCoords[j].z);
 
           const alpha = (1 - dist / maxDistance) * 0.25;
-          lineColors.push(COLOR_AMBER.r, COLOR_AMBER.g, COLOR_AMBER.b, alpha);
-          lineColors.push(COLOR_RUST.r, COLOR_RUST.g, COLOR_RUST.b, alpha);
+          lineColors.push(COLOR_SECONDARY_ACCENT.r, COLOR_SECONDARY_ACCENT.g, COLOR_SECONDARY_ACCENT.b, alpha);
+          lineColors.push(COLOR_PRIMARY_ACCENT.r, COLOR_PRIMARY_ACCENT.g, COLOR_PRIMARY_ACCENT.b, alpha);
         }
       }
     }
@@ -101,7 +101,7 @@ export const Aegis3DGlobe = () => {
     linesGeometry.setAttribute('position', new THREE.Float32BufferAttribute(linePositions, 3));
 
     const linesMaterial = new THREE.LineBasicMaterial({
-      color: COLOR_AMBER,
+      color: COLOR_SECONDARY_ACCENT,
       transparent: true,
       opacity: 0.22,
       blending: THREE.AdditiveBlending
@@ -112,7 +112,7 @@ export const Aegis3DGlobe = () => {
 
     // 5. Latitude & Longitude Wireframe Rings
     const ringMaterial = new THREE.LineBasicMaterial({
-      color: COLOR_AMBER,
+      color: COLOR_SECONDARY_ACCENT,
       transparent: true,
       opacity: 0.12
     });
@@ -145,7 +145,7 @@ export const Aegis3DGlobe = () => {
 
     const orbitMat = new THREE.PointsMaterial({
       size: 5,
-      color: COLOR_BRIGHT_AMBER,
+      color: COLOR_SECONDARY_ACCENT,
       transparent: true,
       opacity: 0.7,
       blending: THREE.AdditiveBlending

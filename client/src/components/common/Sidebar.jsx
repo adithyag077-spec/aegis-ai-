@@ -46,7 +46,7 @@ export const Sidebar = () => {
       key: 'executive',
       title: 'Executive Command',
       icon: Cpu,
-      accentColor: 'text-[#d98a3d]',
+      accentColor: 'text-[#CFD0CD]',
       items: [
         { label: 'JARVIS SOC Console', path: '/app/dashboard', icon: LayoutDashboard },
         { label: 'AI Security Copilot', path: '/app/copilot', icon: Bot, isAi: true },
@@ -61,7 +61,7 @@ export const Sidebar = () => {
       key: 'detection',
       title: 'Threat Detection Suite',
       icon: ShieldAlert,
-      accentColor: 'text-[#b3542e]',
+      accentColor: 'text-[#8A9992]',
       items: [
         { label: 'Phishing Detector', path: '/app/modules/phishing', icon: ShieldAlert },
         { label: 'Scam Text Analyzer', path: '/app/modules/scam-text', icon: MessageSquareWarning },
@@ -75,7 +75,7 @@ export const Sidebar = () => {
       key: 'analytics',
       title: 'Analytics & Telemetry',
       icon: Activity,
-      accentColor: 'text-[#8a9a5b]',
+      accentColor: 'text-[#8A9992]',
       items: [
         { label: 'Threat History', path: '/app/history', icon: History },
         { label: 'Security Analytics', path: '/app/analytics', icon: PieChart },
@@ -87,13 +87,13 @@ export const Sidebar = () => {
   ];
 
   return (
-    <aside className={`neu-raised min-h-[calc(100vh-4rem)] p-4 flex flex-col justify-between hidden md:flex rounded-2xl my-2 bg-[#17130e] transition-all duration-300 relative ${
+    <aside className={`neu-raised min-h-[calc(100vh-4rem)] p-4 flex flex-col justify-between hidden md:flex rounded-2xl my-2 bg-[#55443A] transition-all duration-300 relative border border-[rgba(138,153,146,0.25)] ${
       collapsed ? 'w-20' : 'w-64'
     }`}>
       {/* Collapse/Expand Toggle Button */}
       <button
         onClick={() => setCollapsed(!collapsed)}
-        className="absolute -right-3 top-6 w-6 h-6 rounded-full neu-raised text-[#d98a3d] flex items-center justify-center hover:shadow-glow-primary transition-all z-20"
+        className="absolute -right-3 top-6 w-6 h-6 rounded-full neu-raised text-[#CFD0CD] flex items-center justify-center hover:shadow-glow-primary transition-all z-20 bg-[#55443A] border border-[#8A9992] cursor-pointer"
         title={collapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
       >
         {collapsed ? <ChevronRight className="w-3.5 h-3.5" /> : <ChevronLeft className="w-3.5 h-3.5" />}
@@ -109,7 +109,7 @@ export const Sidebar = () => {
               {!collapsed ? (
                 <button
                   onClick={() => toggleSection(group.key)}
-                  className="w-full px-3 py-1.5 flex items-center justify-between text-[10px] font-mono uppercase tracking-widest text-[#6e6151] font-bold hover:text-[#f2e8d8] transition-colors"
+                  className="w-full px-3 py-1.5 flex items-center justify-between text-[10px] font-mono uppercase tracking-widest text-[#8A9992] font-bold hover:text-[#CFD0CD] transition-colors cursor-pointer"
                 >
                   <div className="flex items-center gap-1.5">
                     <GroupIcon className={`w-3 h-3 ${group.accentColor}`} />
@@ -118,7 +118,7 @@ export const Sidebar = () => {
                   <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${isOpen ? 'transform rotate-180' : ''}`} />
                 </button>
               ) : (
-                <div className="w-full flex justify-center py-2 text-[#6e6151]">
+                <div className="w-full flex justify-center py-2 text-[#8A9992]">
                   <GroupIcon className={`w-3.5 h-3.5 ${group.accentColor}`} />
                 </div>
               )}
@@ -142,17 +142,17 @@ export const Sidebar = () => {
                           className={({ isActive }) =>
                             `flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all relative ${
                               isActive
-                                ? 'neu-inset text-[#f0a355] border-l-2 border-l-[#d98a3d] font-bold shadow-[inset_2px_0_0_#d98a3d]'
-                                : 'text-[#b8a892] hover:text-[#f2e8d8] hover:bg-[#0d0b08]/50'
+                                ? 'neu-inset text-[#CFD0CD] border-l-2 border-l-[#8A9992] font-bold shadow-[inset_2px_0_0_#8A9992] bg-[#4D2308]'
+                                : 'text-[#B8BBB7] hover:text-[#CFD0CD] hover:bg-[#635046]/40'
                             } ${collapsed ? 'justify-center px-0' : ''}`
                           }
                         >
-                          <ItemIcon className={`w-4 h-4 shrink-0 ${item.isAi ? 'text-[#d1693a]' : ''}`} />
+                          <ItemIcon className={`w-4 h-4 shrink-0 ${item.isAi ? 'text-[#8A9992]' : ''}`} />
                           {!collapsed && (
                             <div className="flex items-center justify-between w-full">
                               <span className="truncate">{item.label}</span>
                               {item.isAi && (
-                                <span className="text-[9px] font-mono px-1.5 py-0.2 rounded-full bg-[#7a3a1f]/30 text-[#d1693a] border border-[#b3542e]/30 font-bold">
+                                <span className="text-[9px] font-mono px-1.5 py-0.2 rounded-full bg-[#4D2308] text-[#8A9992] border border-[#8A9992]/30 font-bold">
                                   AI
                                 </span>
                               )}
@@ -171,13 +171,13 @@ export const Sidebar = () => {
 
       {/* Cyber Status Footer Widget */}
       {!collapsed && (
-        <div className="neu-inset p-3.5 rounded-xl mt-4">
-          <div className="flex items-center gap-2 text-[#d98a3d] font-bold text-xs mb-1 font-heading">
-            <Radio className="w-3.5 h-3.5 text-[#d98a3d] animate-pulse" />
+        <div className="neu-inset p-3.5 rounded-xl mt-4 bg-[#4D2308]">
+          <div className="flex items-center gap-2 text-[#CFD0CD] font-bold text-xs mb-1 font-heading">
+            <Radio className="w-3.5 h-3.5 text-[#8A9992] animate-pulse" />
             <span>JARVIS Neural Matrix</span>
           </div>
-          <p className="text-[10px] text-[#b8a892] font-mono leading-relaxed">
-            Dune Spice Telemetry & MongoDB Atlas Active.
+          <p className="text-[10px] text-[#B8BBB7] font-mono leading-relaxed">
+            AEGIS SOC Telemetry Stream Active.
           </p>
         </div>
       )}

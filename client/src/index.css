@@ -5,48 +5,46 @@
 @tailwind utilities;
 
 :root {
-  /* Base surfaces — deep desert night / obsidian */
-  --bg-base: #0d0b08;
-  --bg-surface: #17130e;
-  --bg-surface-raised: #1f1a13;
-  --bg-surface-elevated: #262016;
+  /* New Global Color Palette */
+  --bg-base: #0D1117;                  /* Primary Background */
+  --bg-surface: #4D2308;               /* Secondary Surface / Input Background */
+  --bg-surface-raised: #55443A;        /* Cards / Panels / Tables / Modals */
+  --bg-surface-elevated: #635046;      /* Hover Cards */
 
-  /* Borders / hairlines */
-  --border-subtle: #34291b;
-  --border-strong: #4a3823;
+  /* Borders / Hairlines */
+  --border-subtle: rgba(138, 153, 146, 0.25);
+  --border-strong: #8A9992;             /* Input Border */
 
-  /* Primary accent — Dune sun / spice amber (replaces cyan) */
-  --accent-primary: #d98a3d;
-  --accent-primary-bright: #f0a355;
-  --accent-primary-dim: #a8672c;
+  /* Accents */
+  --accent-primary: #55443A;            /* Liver Chestnut */
+  --accent-primary-bright: #6A5448;     /* Button Hover */
+  --accent-primary-dim: #7B6255;        /* Button Active */
 
-  /* Secondary accent — burnt rust / terracotta (replaces purple) */
-  --accent-secondary: #b3542e;
-  --accent-secondary-bright: #d1693a;
-  --accent-secondary-dim: #7a3a1f;
+  --accent-secondary: #8A9992;          /* Morning Blue */
+  --accent-secondary-bright: #CFD0CD;   /* Almond Light */
+  --accent-secondary-dim: #55443A;
 
-  /* Rare cool accent — desaturated dusk teal */
-  --accent-cool: #5b7a75;
+  --accent-cool: #8A9992;
 
-  /* Semantic status */
-  --status-success: #8a9a5b;   /* sage/olive green */
-  --status-warning: #d9a441;   /* amber-gold */
-  --status-danger:  #a83b2e;   /* rust red */
+  /* Semantic Status Colors */
+  --status-success: #8A9992;
+  --status-warning: #A88452;
+  --status-danger:  #8C5A4A;
+  --status-info:    #8A9992;
 
-  /* Text */
-  --text-primary: #f2e8d8;     /* bone/sand white */
-  --text-secondary: #b8a892;   /* muted sand */
-  --text-muted: #6e6151;
+  /* Text Colors */
+  --text-primary: #CFD0CD;            /* Almond Light */
+  --text-secondary: #B8BBB7;          /* Secondary Text */
+  --text-muted: #8A9992;              /* Muted Text */
 
-  /* Glow */
-  --glow-primary: 0 0 24px rgba(217, 138, 61, 0.35);
-  --glow-secondary: 0 0 24px rgba(179, 84, 46, 0.30);
-  --glow-cyan: 0 0 24px rgba(217, 138, 61, 0.35);
-  --glow-purple: 0 0 24px rgba(179, 84, 46, 0.30);
+  /* Glow & Shadows */
+  --glow-primary: 0 0 20px rgba(138, 153, 146, 0.20);
+  --glow-secondary: 0 4px 20px rgba(85, 68, 58, 0.35);
+  --glow-cyan: 0 0 20px rgba(138, 153, 146, 0.20);
+  --glow-purple: 0 4px 20px rgba(85, 68, 58, 0.35);
 
-  /* Shadow pair for neumorphic surfaces */
-  --shadow-dark: rgba(0, 0, 0, 0.6);
-  --shadow-light: rgba(255, 255, 255, 0.025);
+  --shadow-dark: rgba(0, 0, 0, 0.35);
+  --shadow-light: rgba(138, 153, 146, 0.05);
 }
 
 @layer base {
@@ -56,7 +54,7 @@
     font-family: 'Inter', sans-serif;
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
-    min-h-screen: 100vh;
+    min-height: 100vh;
     position: relative;
   }
 
@@ -73,133 +71,89 @@
 
 /* Gradients */
 .gradient-text-hero {
-  background: linear-gradient(90deg, #f2e8d8 0%, #d98a3d 50%, #b3542e 100%);
+  background: linear-gradient(135deg, #CFD0CD 0%, #8A9992 50%, #55443A 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 
 .gradient-ambient {
-  background: radial-gradient(ellipse at top, rgba(217, 138, 61, 0.10), transparent 60%),
-              radial-gradient(ellipse at bottom right, rgba(179, 84, 46, 0.08), transparent 55%),
-              var(--bg-base);
+  background: linear-gradient(180deg, #0D1117 0%, #4D2308 100%);
 }
 
 .gradient-shimmer {
-  background: linear-gradient(120deg, #a8672c, #d98a3d, #b3542e, #a8672c);
+  background: linear-gradient(135deg, #55443A, #8A9992, #4D2308, #55443A);
   background-size: 300% 300%;
   animation: gradientShift 10s ease infinite;
 }
 
-/* Core Neumorphic Shadow System */
-.neu-raised {
-  background: var(--bg-surface);
+/* Core Neumorphic & Panel Shadows */
+.neu-raised, .glass-panel, .saas-panel, .glass-card, .soc-panel {
+  background: var(--bg-surface-raised);
   border-radius: 20px;
-  box-shadow:
-    8px 8px 16px var(--shadow-dark),
-    -8px -8px 16px var(--shadow-light);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
   border: 1px solid var(--border-subtle);
-  transition: box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-              transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .neu-inset {
   background: var(--bg-surface);
   border-radius: 16px;
-  box-shadow:
-    inset 6px 6px 12px var(--shadow-dark),
-    inset -6px -6px 12px var(--shadow-light);
-  border: 1px solid var(--border-subtle);
+  box-shadow: inset 4px 4px 10px rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--border-strong);
 }
 
-.neu-raised:hover {
-  box-shadow:
-    12px 12px 24px var(--shadow-dark),
-    -12px -12px 24px var(--shadow-light),
-    var(--glow-primary);
+.neu-raised:hover, .glass-card:hover, .soc-panel:hover {
+  background: var(--bg-surface-elevated);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45), var(--glow-primary);
   transform: translateY(-4px);
   border-color: var(--border-strong);
 }
 
-/* Glassmorphic Panel Utilities */
-.glass-panel, .saas-panel, .glass-card, .soc-panel {
-  background: var(--bg-surface);
-  border-radius: 20px;
-  box-shadow:
-    8px 8px 16px var(--shadow-dark),
-    -8px -8px 16px var(--shadow-light);
-  border: 1px solid var(--border-subtle);
-  transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.glass-card:hover, .soc-panel:hover {
-  box-shadow:
-    12px 12px 24px var(--shadow-dark),
-    -12px -12px 24px var(--shadow-light),
-    var(--glow-primary);
-  transform: translateY(-4px);
-  border-color: var(--border-strong);
-}
-
-/* Tactile Dune Buttons */
+/* Buttons */
 .btn-cyber-primary, .btn-soc-neon, .btn-ember-primary, .btn-neu-action {
   position: relative;
-  background: var(--accent-primary);
-  color: var(--bg-base);
+  background: #55443A;
+  color: #CFD0CD;
   font-weight: 700;
   border-radius: 12px;
-  box-shadow:
-    6px 6px 12px var(--shadow-dark),
-    -6px -6px 12px var(--shadow-light);
+  box-shadow: 0 4px 20px rgba(85, 68, 58, 0.35);
   transition: all 0.2s ease-out;
   overflow: hidden;
-  border: 1px solid var(--accent-primary-bright);
+  border: 1px solid #8A9992;
 }
 
 .btn-cyber-primary:hover, .btn-soc-neon:hover, .btn-ember-primary:hover, .btn-neu-action:hover {
-  background: var(--accent-primary-bright);
-  box-shadow:
-    8px 8px 16px var(--shadow-dark),
-    -8px -8px 16px var(--shadow-light),
-    var(--glow-primary);
+  background: #6A5448;
+  box-shadow: 0 6px 24px rgba(85, 68, 58, 0.45), var(--glow-primary);
   transform: translateY(-2px);
-  color: var(--bg-base);
+  color: #CFD0CD;
 }
 
 .btn-cyber-primary:active, .btn-soc-neon:active, .btn-ember-primary:active, .btn-neu-action:active {
-  box-shadow:
-    inset 4px 4px 8px var(--shadow-dark),
-    inset -4px -4px 8px var(--shadow-light);
+  background: #7B6255;
   transform: translateY(0);
 }
 
-/* Burnt Rust Copilot Button */
 .btn-copilot-green, .btn-neu-purple {
   position: relative;
-  background: var(--bg-surface);
-  color: var(--accent-secondary-bright);
+  background: #4D2308;
+  color: #CFD0CD;
   border-radius: 12px;
-  box-shadow:
-    6px 6px 12px var(--shadow-dark),
-    -6px -6px 12px var(--shadow-light);
-  border: 1px solid var(--accent-secondary);
+  box-shadow: 0 4px 20px rgba(85, 68, 58, 0.35);
+  border: 1px solid #8A9992;
   transition: all 0.2s ease-out;
 }
 
 .btn-copilot-green:hover, .btn-neu-purple:hover {
-  background: var(--accent-secondary);
-  box-shadow:
-    8px 8px 16px var(--shadow-dark),
-    -8px -8px 16px var(--shadow-light),
-    var(--glow-secondary);
+  background: #55443A;
+  box-shadow: 0 6px 24px rgba(85, 68, 58, 0.45), var(--glow-primary);
   transform: translateY(-2px);
-  color: var(--text-primary);
+  color: #CFD0CD;
 }
 
 .btn-copilot-green:active, .btn-neu-purple:active {
-  box-shadow:
-    inset 4px 4px 8px var(--shadow-dark),
-    inset -4px -4px 8px var(--shadow-light);
+  background: #7B6255;
   transform: translateY(0);
 }
 
@@ -218,14 +172,14 @@
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--bg-base);
+  background: #0D1117;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--border-strong);
+  background: #55443A;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--accent-primary);
+  background: #8A9992;
 }
 
 /* Respect Reduced Motion Preferences */

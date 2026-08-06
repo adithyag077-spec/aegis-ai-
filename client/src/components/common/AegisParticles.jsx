@@ -41,9 +41,9 @@ export const AegisParticles = ({ count = 150 }) => {
 
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(217, 138, 61, ${p.alpha})`;
+        ctx.fillStyle = `rgba(138, 153, 146, ${p.alpha})`;
         ctx.shadowBlur = 4;
-        ctx.shadowColor = 'rgba(217, 138, 61, 0.4)';
+        ctx.shadowColor = 'rgba(138, 153, 146, 0.4)';
         ctx.fill();
       });
 

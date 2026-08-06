@@ -43,25 +43,25 @@ export const AegisBootIntro = ({ onComplete }) => {
         animate={{ opacity: phase === 4 ? 0 : 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: phase === 4 ? 0.8 : 0.4 }}
-        className="fixed inset-0 z-[99999] bg-[#0d0b08] flex flex-col items-center justify-center overflow-hidden pointer-events-auto"
+        className="fixed inset-0 z-[99999] bg-[#0D1117] flex flex-col items-center justify-center overflow-hidden pointer-events-auto"
       >
-        {/* Ambient Desert Grid (3% Opacity) */}
+        {/* Ambient Grid (3% Opacity) */}
         <div 
           className="absolute inset-0 pointer-events-none opacity-[0.03]"
           style={{
-            backgroundImage: `linear-gradient(#d98a3d 1px, transparent 1px), linear-gradient(90deg, #d98a3d 1px, transparent 1px)`,
+            backgroundImage: `linear-gradient(#8A9992 1px, transparent 1px), linear-gradient(90deg, #8A9992 1px, transparent 1px)`,
             backgroundSize: '40px 40px'
           }}
         />
 
-        {/* Phase 0 & 1: Amber Glow */}
+        {/* Phase 0 & 1: Ambient Glow */}
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: phase >= 4 ? 0.1 : 1.2, opacity: phase >= 4 ? 1 : 0.4 }}
           transition={{ duration: phase === 4 ? 0.8 : 1.2, ease: [0.22, 1, 0.36, 1] }}
           className="absolute w-[500px] h-[500px] rounded-full blur-[120px] pointer-events-none"
           style={{
-            background: 'radial-gradient(circle, rgba(217, 138, 61, 0.6) 0%, rgba(179, 84, 46, 0.3) 50%, transparent 80%)'
+            background: 'radial-gradient(circle, rgba(138, 153, 146, 0.5) 0%, rgba(85, 68, 58, 0.3) 50%, transparent 80%)'
           }}
         />
 
@@ -93,7 +93,7 @@ export const AegisBootIntro = ({ onComplete }) => {
                   ease: [0.22, 1, 0.36, 1],
                   delay: (i % 20) * 0.01
                 }}
-                className="absolute w-1.5 h-1.5 rounded-full bg-[#f0a355] shadow-[0_0_8px_#d98a3d]"
+                className="absolute w-1.5 h-1.5 rounded-full bg-[#8A9992] shadow-[0_0_8px_#55443A]"
               />
             );
           })}
@@ -117,19 +117,19 @@ export const AegisBootIntro = ({ onComplete }) => {
                   initial={{ scale: 0.8, opacity: 0.8 }}
                   animate={{ scale: 1.6, opacity: 0 }}
                   transition={{ duration: 1.5, repeat: Infinity, ease: 'easeOut' }}
-                  className="absolute w-28 h-28 rounded-full border border-[#d98a3d]/60 pointer-events-none"
+                  className="absolute w-28 h-28 rounded-full border border-[#8A9992]/60 pointer-events-none"
                 />
                 <motion.div
                   initial={{ rotate: 0 }}
                   animate={{ rotate: 360 }}
                   transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
-                  className="absolute w-36 h-36 rounded-full border border-dashed border-[#b3542e]/40 pointer-events-none"
+                  className="absolute w-36 h-36 rounded-full border border-dashed border-[#55443A]/40 pointer-events-none"
                 />
               </>
             )}
 
-            <div className="w-24 h-24 rounded-3xl neu-raised border border-[#d98a3d]/50 flex items-center justify-center text-[#d98a3d] shadow-[0_0_35px_rgba(217,138,61,0.4)] bg-[#17130e]">
-              <Shield className="w-12 h-12 text-[#d98a3d]" strokeWidth={2.2} />
+            <div className="w-24 h-24 rounded-3xl neu-raised border border-[#8A9992]/50 flex items-center justify-center text-[#CFD0CD] shadow-[0_0_35px_rgba(138,153,146,0.3)] bg-[#55443A]">
+              <Shield className="w-12 h-12 text-[#CFD0CD]" strokeWidth={2.2} />
             </div>
           </motion.div>
 
@@ -142,10 +142,10 @@ export const AegisBootIntro = ({ onComplete }) => {
               transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
               className="text-center space-y-2 font-mono"
             >
-              <h1 className="text-3xl sm:text-4xl font-extrabold text-[#f2e8d8] font-heading tracking-[0.25em] uppercase drop-shadow-[0_0_12px_rgba(217,138,61,0.5)]">
+              <h1 className="text-3xl sm:text-4xl font-extrabold text-[#CFD0CD] font-heading tracking-[0.25em] uppercase drop-shadow-[0_0_12px_rgba(138,153,146,0.4)]">
                 AEGIS
               </h1>
-              <p className="text-xs text-[#b8a892] tracking-[0.2em] uppercase font-bold">
+              <p className="text-xs text-[#8A9992] tracking-[0.2em] uppercase font-bold">
                 Enterprise AI Security Platform
               </p>
             </motion.div>
@@ -157,9 +157,9 @@ export const AegisBootIntro = ({ onComplete }) => {
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="absolute bottom-12 flex items-center gap-2 px-4 py-1.5 rounded-full neu-inset text-[#f0a355] border border-[#4a3823] text-xs font-mono font-bold"
+            className="absolute bottom-12 flex items-center gap-2 px-4 py-1.5 rounded-full neu-inset text-[#CFD0CD] border border-[#8A9992] text-xs font-mono font-bold"
           >
-            <Radio className="w-3.5 h-3.5 animate-pulse text-[#d98a3d]" />
+            <Radio className="w-3.5 h-3.5 animate-pulse text-[#8A9992]" />
             <span>INITIALIZING JARVIS NEURAL ENGINE...</span>
           </motion.div>
         )}

@@ -9,36 +9,36 @@ export default {
     extend: {
       colors: {
         dune: {
-          base: '#0d0b08',
-          surface: '#17130e',
-          raised: '#1f1a13',
-          elevated: '#262016',
-          borderSubtle: '#34291b',
-          borderStrong: '#4a3823',
-          amber: '#d98a3d',
-          amberBright: '#f0a355',
-          amberDim: '#a8672c',
-          rust: '#b3542e',
-          rustBright: '#d1693a',
-          rustDim: '#7a3a1f',
-          cool: '#5b7a75',
-          sage: '#8a9a5b',
-          gold: '#d9a441',
-          danger: '#a83b2e',
-          textPrimary: '#f2e8d8',
-          textSecondary: '#b8a892',
-          textMuted: '#6e6151'
+          base: '#0D1117',
+          surface: '#4D2308',
+          raised: '#55443A',
+          elevated: '#635046',
+          borderSubtle: 'rgba(138, 153, 146, 0.25)',
+          borderStrong: '#8A9992',
+          amber: '#55443A',
+          amberBright: '#8A9992',
+          amberDim: '#4D2308',
+          rust: '#4D2308',
+          rustBright: '#8C5A4A',
+          rustDim: '#55443A',
+          cool: '#8A9992',
+          sage: '#8A9992',
+          gold: '#A88452',
+          danger: '#8C5A4A',
+          textPrimary: '#CFD0CD',
+          textSecondary: '#B8BBB7',
+          textMuted: '#8A9992'
         },
         soc: {
-          void: '#0d0b08',
-          surface: '#17130e',
-          panel: '#17130e',
-          amber: '#d98a3d',
-          cyan: '#d98a3d',
-          purple: '#b3542e',
-          signalGreen: '#8a9a5b',
-          textPrimary: '#f2e8d8',
-          textSecondary: '#b8a892'
+          void: '#0D1117',
+          surface: '#4D2308',
+          panel: '#55443A',
+          amber: '#55443A',
+          cyan: '#8A9992',
+          purple: '#4D2308',
+          signalGreen: '#8A9992',
+          textPrimary: '#CFD0CD',
+          textSecondary: '#B8BBB7'
         }
       },
       fontFamily: {
@@ -47,13 +47,13 @@ export default {
         mono: ['JetBrains Mono', 'Fira Code', 'monospace']
       },
       boxShadow: {
-        'neu-raised': '8px 8px 16px rgba(0, 0, 0, 0.6), -8px -8px 16px rgba(255, 255, 255, 0.025)',
-        'neu-inset': 'inset 6px 6px 12px rgba(0, 0, 0, 0.6), inset -6px -6px 12px rgba(255, 255, 255, 0.025)',
-        'glow-primary': '0 0 24px rgba(217, 138, 61, 0.35)',
-        'glow-secondary': '0 0 24px rgba(179, 84, 46, 0.30)',
-        'glow-cyan': '0 0 24px rgba(217, 138, 61, 0.35)',
-        'glow-purple': '0 0 24px rgba(179, 84, 46, 0.30)',
-        'glow-green': '0 0 24px rgba(138, 154, 91, 0.35)'
+        'neu-raised': '0 8px 30px rgba(0, 0, 0, 0.35)',
+        'neu-inset': 'inset 4px 4px 10px rgba(0, 0, 0, 0.5), inset -4px -4px 10px rgba(255, 255, 255, 0.02)',
+        'glow-primary': '0 0 20px rgba(138, 153, 146, 0.20)',
+        'glow-secondary': '0 0 20px rgba(85, 68, 58, 0.35)',
+        'glow-cyan': '0 0 20px rgba(138, 153, 146, 0.20)',
+        'glow-purple': '0 0 20px rgba(77, 35, 8, 0.35)',
+        'glow-green': '0 0 20px rgba(138, 153, 146, 0.20)'
       },
       borderRadius: {
         'neu-sm': '12px',
@@ -77,8 +77,8 @@ export default {
           '100%': { transform: 'scale(1.4)', opacity: '0' }
         },
         statusPulse: {
-          '0%, 100%': { boxShadow: '0 0 4px rgba(138, 154, 91, 0.6)' },
-          '50%': { boxShadow: '0 0 14px rgba(138, 154, 91, 0.9)' }
+          '0%, 100%': { boxShadow: '0 0 4px rgba(138, 153, 146, 0.6)' },
+          '50%': { boxShadow: '0 0 14px rgba(138, 153, 146, 0.9)' }
         },
         gradientShift: {
           '0%, 100%': { backgroundPosition: '0% 50%' },
