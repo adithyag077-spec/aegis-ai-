@@ -4,8 +4,9 @@
   "description": "AEGIS SOC Enterprise Cyber Security Platform",
   "private": true,
   "scripts": {
-    "postinstall": "npm install --prefix server && npm install --prefix client",
-    "build": "npm run build --prefix client",
+    "install-deps": "npm install --prefix server && npm install --prefix client",
+    "postinstall": "npm run install-deps",
+    "build": "npm run install-deps && npm run build --prefix client",
     "start": "node server/src/server.js",
     "dev": "npm run dev --prefix server"
   }
