@@ -5,15 +5,16 @@ const AppError = require('../../utils/AppError');
 
 let genAI = null;
 
-if (env.GEMINI_API_KEY && env.GEMINI_API_KEY !== 'YOUR_GEMINI_API_KEY_HERE' && !env.GEMINI_API_KEY.startsWith('AQ.')) {
+const apiKey = env.GEMINI_API_KEY || process.env.GEMINI_API_KEY;
+if (apiKey && apiKey.trim() !== '' && !apiKey.includes('YOUR_GEMINI_API_KEY')) {
   try {
-    genAI = new GoogleGenerativeAI(env.GEMINI_API_KEY);
+    genAI = new GoogleGenerativeAI(apiKey);
     logger.info('🤖 Real Google Gemini API Client Initialized Successfully');
   } catch (err) {
     logger.error('❌ Failed to initialize Google Generative AI Client:', { error: err.message });
   }
 } else {
-  logger.warn('⚠️ GEMINI_API_KEY missing, unverified, or placeholder in .env. Engine utilizing Intelligent Heuristic Security Analyzer fallback.');
+  logger.warn('⚠️ GEMINI_API_KEY missing or placeholder. Engine utilizing Intelligent Heuristic Security Analyzer fallback.');
 }
 
 /**

@@ -51,6 +51,26 @@ if (fs.existsSync(clientDistPath)) {
 // Master API Routes Multiplexer
 app.use('/api/v1', routes);
 
+// Root Health & Uptime Check for Render Load Balancers & Pings
+app.get('/', (req, res, next) => {
+  const indexPath = path.join(clientDistPath, 'index.html');
+  if (fs.existsSync(indexPath)) {
+    return res.sendFile(indexPath);
+  }
+  res.status(200).json({
+    status: 'UP',
+    system: 'AegisAI Cyber Defense Platform',
+    message: 'AegisAI Cyber Defense API Server Online',
+    version: '1.0.0',
+    healthCheck: '/api/v1/health',
+    timestamp: new Date().toISOString()
+  });
+});
+
+app.head('/', (req, res) => {
+  res.status(200).end();
+});
+
 // Handle Single Page Application fallback & 404s
 app.use('*', (req, res, next) => {
   if (req.originalUrl.startsWith('/api')) {

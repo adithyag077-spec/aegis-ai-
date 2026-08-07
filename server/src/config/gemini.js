@@ -4,9 +4,10 @@ const logger = require('../utils/logger');
 
 let genAI = null;
 
-if (env.GEMINI_API_KEY && env.GEMINI_API_KEY !== 'YOUR_GEMINI_API_KEY_HERE') {
+const apiKey = env.GEMINI_API_KEY || process.env.GEMINI_API_KEY;
+if (apiKey && apiKey.trim() !== '' && !apiKey.includes('YOUR_GEMINI_API_KEY')) {
   try {
-    genAI = new GoogleGenerativeAI(env.GEMINI_API_KEY);
+    genAI = new GoogleGenerativeAI(apiKey);
     logger.info('🤖 Google Gemini AI Engine Initialized successfully on backend');
   } catch (err) {
     logger.error('❌ Failed to initialize Google Gemini AI Engine:', { error: err.message });
