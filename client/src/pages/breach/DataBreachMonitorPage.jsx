@@ -33,8 +33,9 @@ export const DataBreachMonitorPage = () => {
     try {
       setLoadingHistory(true);
       const res = await breachService.getHistory();
-      if (res.data?.logs) {
-        setHistory(res.data.logs);
+      const logsList = res.data?.logs || res.logs || (Array.isArray(res) ? res : []);
+      if (Array.isArray(logsList)) {
+        setHistory(logsList);
       }
     } catch (err) {
       console.error('Failed to load breach history', err);
@@ -53,10 +54,17 @@ export const DataBreachMonitorPage = () => {
     try {
       setLoading(true);
       const res = await breachService.checkBreach({ email });
-      if (res.data?.result) {
-        setResult(res.data.result);
-        if (res.data.result.breachCount > 0) {
-          addToast('WARNING', `Identified ${res.data.result.breachCount} data breach exposures for ${email}`, 'Breach Detected');
+      const rawResult = res?.data?.result || res?.result || res?.data || res;
+      if (rawResult && typeof rawResult === 'object') {
+        const validatedResult = {
+          ...rawResult,
+          breachesFound: Array.isArray(rawResult.breachesFound) ? rawResult.breachesFound : [],
+          breachCount: typeof rawResult.breachCount === 'number' ? rawResult.breachCount : 0,
+          recommendations: rawResult.recommendations || {}
+        };
+        setResult(validatedResult);
+        if (validatedResult.breachCount > 0) {
+          addToast('WARNING', `Identified ${validatedResult.breachCount} data breach exposures for ${email}`, 'Breach Detected');
         } else {
           addToast('SAFE', `No public breach exposures detected for ${email}`, 'Clean Audit');
         }

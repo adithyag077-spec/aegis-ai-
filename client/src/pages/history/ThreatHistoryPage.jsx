@@ -17,9 +17,10 @@ export const ThreatHistoryPage = () => {
   const fetchHistory = async () => {
     try {
       const res = await scanService.getThreatHistory();
-      if (res.data?.logs) {
-        setLogs(res.data.logs);
-        setFilteredLogs(res.data.logs);
+      const logsList = res.data?.logs || res.logs || (Array.isArray(res) ? res : []);
+      if (Array.isArray(logsList)) {
+        setLogs(logsList);
+        setFilteredLogs(logsList);
       }
     } catch (err) {
       console.error(err);
@@ -155,7 +156,7 @@ export const ThreatHistoryPage = () => {
               <p className="p-3 rounded-xl bg-slate-900 font-mono text-xs text-slate-300 break-all">{selectedLog.inputSummary}</p>
             </div>
 
-            {selectedLog.analysisDetails?.indicators?.length > 0 && (
+            {Array.isArray(selectedLog.analysisDetails?.indicators) && selectedLog.analysisDetails.indicators.length > 0 && (
               <div>
                 <h4 className="text-xs font-mono uppercase text-slate-400 mb-2">Detected Threat Indicators</h4>
                 <ul className="space-y-1.5">
@@ -169,7 +170,7 @@ export const ThreatHistoryPage = () => {
               </div>
             )}
 
-            {selectedLog.analysisDetails?.recommendations?.length > 0 && (
+            {Array.isArray(selectedLog.analysisDetails?.recommendations) && selectedLog.analysisDetails.recommendations.length > 0 && (
               <div>
                 <h4 className="text-xs font-mono uppercase text-slate-400 mb-2">Defense Recommendations</h4>
                 <ul className="space-y-1.5">

@@ -19,7 +19,18 @@ export const PrivacyLeakScanner = () => {
 
     try {
       const res = await scanService.scanPrivacyLeak({ text });
-      setResult(res.data.result);
+      const rawResult = res?.data?.result || res?.result || res?.data || res;
+      if (rawResult && typeof rawResult === 'object') {
+        setResult({
+          ...rawResult,
+          detectedSensitiveData: Array.isArray(rawResult.detectedSensitiveData) ? rawResult.detectedSensitiveData : (Array.isArray(rawResult.detectedPII) ? rawResult.detectedPII : []),
+          indicators: Array.isArray(rawResult.indicators) ? rawResult.indicators : [],
+          recommendations: Array.isArray(rawResult.recommendations) ? rawResult.recommendations : (Array.isArray(rawResult.safeActions) ? rawResult.safeActions : []),
+          verdict: rawResult.verdict || 'Privacy Leak Audit Complete',
+          threatLevel: rawResult.threatLevel || 'SAFE',
+          riskScore: typeof rawResult.riskScore === 'number' ? rawResult.riskScore : 0
+        });
+      }
     } catch (err) {
       setError(err.message || 'Privacy leak audit failed.');
     } finally {

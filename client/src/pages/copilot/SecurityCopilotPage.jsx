@@ -61,8 +61,9 @@ export const SecurityCopilotPage = () => {
         ]);
       }
 
-      if (scanRes.data?.logs) {
-        setRecentScans(scanRes.data.logs.slice(0, 5));
+      const scanList = scanRes.data?.logs || scanRes.logs || (Array.isArray(scanRes) ? scanRes : []);
+      if (Array.isArray(scanList)) {
+        setRecentScans(scanList.slice(0, 5));
       }
     } catch (err) {
       console.error('Copilot init error', err);

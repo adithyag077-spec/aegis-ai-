@@ -25,13 +25,23 @@ exports.getIncidents = async (req, res, next) => {
         aiRemediationPlan: '1. Revoke active SSO session tokens. 2. Block domain at perimeter firewall. 3. Force MFA password reset.',
         assignedTo: 'JARVIS SOC AI Lead'
       });
-      return res.status(200).json({ success: true, count: 1, incidents: [sample] });
+      return res.status(200).json({
+        success: true,
+        statusCode: 200,
+        count: 1,
+        incidents: [sample],
+        data: { incidents: [sample] },
+        meta: { timestamp: new Date().toISOString() }
+      });
     }
 
     res.status(200).json({
       success: true,
+      statusCode: 200,
       count: incidents.length,
-      incidents
+      incidents,
+      data: { incidents },
+      meta: { timestamp: new Date().toISOString() }
     });
   } catch (error) {
     next(error);
@@ -59,7 +69,10 @@ exports.createIncident = async (req, res, next) => {
 
     res.status(201).json({
       success: true,
-      incident
+      statusCode: 201,
+      incident,
+      data: { incident },
+      meta: { timestamp: new Date().toISOString() }
     });
   } catch (error) {
     next(error);
@@ -75,7 +88,7 @@ exports.updateIncidentStatus = async (req, res, next) => {
     const incident = await Incident.findOne({ _id: req.params.id, userId: req.user.id });
 
     if (!incident) {
-      return res.status(404).json({ success: false, message: 'Incident case not found' });
+      return res.status(404).json({ success: false, statusCode: 404, message: 'Incident case not found' });
     }
 
     if (status) incident.status = status;
@@ -83,7 +96,10 @@ exports.updateIncidentStatus = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      incident
+      statusCode: 200,
+      incident,
+      data: { incident },
+      meta: { timestamp: new Date().toISOString() }
     });
   } catch (error) {
     next(error);

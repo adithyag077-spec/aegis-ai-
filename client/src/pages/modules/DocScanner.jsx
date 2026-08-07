@@ -28,7 +28,18 @@ export const DocScanner = () => {
         formData.append('text', text || 'Sample document content with SSN: 000-12-3456');
         res = await scanService.scanDocument(formData);
       }
-      setResult(res.data.result);
+      const rawResult = res?.data?.result || res?.result || res?.data || res;
+      if (rawResult && typeof rawResult === 'object') {
+        setResult({
+          ...rawResult,
+          detectedPII: Array.isArray(rawResult.detectedPII) ? rawResult.detectedPII : (Array.isArray(rawResult.detectedSensitiveData) ? rawResult.detectedSensitiveData : []),
+          indicators: Array.isArray(rawResult.indicators) ? rawResult.indicators : [],
+          recommendations: Array.isArray(rawResult.recommendations) ? rawResult.recommendations : (Array.isArray(rawResult.safeActions) ? rawResult.safeActions : []),
+          verdict: rawResult.verdict || 'Document Audit Complete',
+          threatLevel: rawResult.threatLevel || 'SAFE',
+          riskScore: typeof rawResult.riskScore === 'number' ? rawResult.riskScore : 0
+        });
+      }
     } catch (err) {
       setError(err.message || 'Document security scan failed.');
     } finally {

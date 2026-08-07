@@ -34,8 +34,9 @@ export const IncidentManagementPage = () => {
     try {
       setLoading(true);
       const res = await incidentService.getIncidents();
-      if (res.data?.incidents) {
-        setIncidents(res.data.incidents);
+      const incList = res.data?.incidents || res.incidents || (Array.isArray(res) ? res : []);
+      if (Array.isArray(incList)) {
+        setIncidents(incList);
       }
     } catch (err) {
       addToast('DANGER', 'Failed to load incident cases');

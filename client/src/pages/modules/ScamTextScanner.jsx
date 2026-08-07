@@ -20,7 +20,17 @@ export const ScamTextScanner = () => {
 
     try {
       const res = await scanService.scanScamText({ messageText, senderInfo });
-      setResult(res.data.result);
+      const rawResult = res?.data?.result || res?.result || res?.data || res;
+      if (rawResult && typeof rawResult === 'object') {
+        setResult({
+          ...rawResult,
+          indicators: Array.isArray(rawResult.indicators) ? rawResult.indicators : [],
+          recommendations: Array.isArray(rawResult.recommendations) ? rawResult.recommendations : (Array.isArray(rawResult.safeActions) ? rawResult.safeActions : []),
+          verdict: rawResult.verdict || 'Scam Message Audit Complete',
+          threatLevel: rawResult.threatLevel || 'SAFE',
+          riskScore: typeof rawResult.riskScore === 'number' ? rawResult.riskScore : 0
+        });
+      }
     } catch (err) {
       setError(err.message || 'Scam text scan failed.');
     } finally {

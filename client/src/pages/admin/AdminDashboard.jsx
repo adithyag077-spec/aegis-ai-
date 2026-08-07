@@ -15,8 +15,11 @@ export const AdminDashboard = () => {
           adminService.getStats(),
           adminService.getUsers()
         ]);
-        if (sRes.data) setStats(sRes.data);
-        if (uRes.data?.users) setUsers(uRes.data.users);
+        const sData = sRes.data || sRes;
+        if (sData) setStats(sData);
+
+        const uList = uRes.data?.users || uRes.users || (Array.isArray(uRes) ? uRes : []);
+        if (Array.isArray(uList)) setUsers(uList);
       } catch (err) {
         console.error(err);
       } finally {
@@ -97,7 +100,7 @@ export const AdminDashboard = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/60">
-              {users.map((u) => (
+              {Array.isArray(users) && users.map((u) => (
                 <tr key={u._id} className="hover:bg-slate-800/40 transition-colors">
                   <td className="py-3 px-4 font-semibold text-slate-200">{u.fullName}</td>
                   <td className="py-3 px-4 text-slate-400 font-mono">{u.email}</td>

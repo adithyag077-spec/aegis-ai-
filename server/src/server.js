@@ -69,6 +69,11 @@ app.use('*', (req, res, next) => {
 app.use(errorMiddleware);
 
 const PORT = process.env.PORT || env.PORT || 5000;
-app.listen(PORT, () => {
-  logger.info(`🚀 AegisAI Cyber Defense Backend listening on port ${PORT} [Mode: ${env.NODE_ENV}]`);
-});
+
+if (require.main === module) {
+  app.listen(PORT, () => {
+    logger.info(`🚀 AegisAI Cyber Defense Backend listening on port ${PORT} [Mode: ${env.NODE_ENV}]`);
+  });
+}
+
+module.exports = app;

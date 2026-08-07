@@ -42,10 +42,14 @@ export const AnalyticsPage = () => {
 
   const COLORS = ['#8a9a5b', '#d98a3d', '#d9a441', '#a83b2e', '#b3542e', '#5b7a75'];
 
-  const timelineData = riskOverview?.history?.map((h, i) => ({
+  const historyArray = Array.isArray(riskOverview?.history) 
+    ? riskOverview.history 
+    : (Array.isArray(riskOverview) ? riskOverview : null);
+
+  const timelineData = historyArray ? historyArray.map((h, i) => ({
     time: new Date(h.calculatedAt || Date.now() - (5 - i) * 86400000).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
     score: h.score
-  })) || [
+  })) : [
     { time: 'Day 1', score: 10 },
     { time: 'Day 2', score: 25 },
     { time: 'Day 3', score: 18 },

@@ -39,8 +39,16 @@ export const AttackSimulatorPage = () => {
         simulatorService.getScenarios(),
         simulatorService.getUserProgress()
       ]);
-      if (scenariosRes.data?.scenarios) setScenarios(scenariosRes.data.scenarios);
-      if (progressRes.data) setProgress(progressRes.data);
+      const scList = scenariosRes.data?.scenarios || scenariosRes.scenarios || (Array.isArray(scenariosRes) ? scenariosRes : []);
+      if (Array.isArray(scList)) setScenarios(scList);
+
+      const prog = progressRes.data || progressRes || {};
+      setProgress({
+        awarenessScore: typeof prog.awarenessScore === 'number' ? prog.awarenessScore : 50,
+        totalCompleted: typeof prog.totalCompleted === 'number' ? prog.totalCompleted : 0,
+        accuracyPercentage: typeof prog.accuracyPercentage === 'number' ? prog.accuracyPercentage : 0,
+        badges: Array.isArray(prog.badges) ? prog.badges : []
+      });
     } catch (err) {
       addToast('DANGER', 'Failed to load cyber attack scenarios');
     } finally {

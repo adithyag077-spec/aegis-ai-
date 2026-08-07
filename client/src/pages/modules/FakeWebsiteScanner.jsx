@@ -19,7 +19,17 @@ export const FakeWebsiteScanner = () => {
 
     try {
       const res = await scanService.scanFakeWebsite({ url });
-      setResult(res.data.result);
+      const rawResult = res?.data?.result || res?.result || res?.data || res;
+      if (rawResult && typeof rawResult === 'object') {
+        setResult({
+          ...rawResult,
+          indicators: Array.isArray(rawResult.indicators) ? rawResult.indicators : [],
+          recommendations: Array.isArray(rawResult.recommendations) ? rawResult.recommendations : (Array.isArray(rawResult.safeActions) ? rawResult.safeActions : []),
+          verdict: rawResult.verdict || 'Fake Website Audit Complete',
+          threatLevel: rawResult.threatLevel || 'SAFE',
+          riskScore: typeof rawResult.riskScore === 'number' ? rawResult.riskScore : 0
+        });
+      }
     } catch (err) {
       setError(err.message || 'Fake website audit failed.');
     } finally {
